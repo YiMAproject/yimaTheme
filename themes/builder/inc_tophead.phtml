@@ -1,0 +1,46 @@
+<!-- START TOP LINE-->
+<div class="top_line"></div>
+<!-- END TOP LINE-->
+
+<!--PAGE HEAD-->
+<div class="page_head">
+    <div class="container">
+        <div class="row">
+            <div class="span3">
+                <!--START LOGO IMAGE-->
+                <div class="logo">
+                    <a href="<?php echo $this->url('home') ?>">
+                        <img alt="RAYA media <?php echo $this->translate('Application Framework'); ?>" src="<?php echo $this->staticServer('images/logo.png') ?>"/>
+                    </a>
+                </div>
+                <!-- END LOGO IMAGE-->
+            </div>
+            <div class="span9">
+                <!-- START MAIN MENU-->
+                <nav>
+                    <ul class="menu">
+                        <!--
+                        <li class="current-menu-item"><a href="index.html">Home</a>
+                            <ul class="sub-menu">
+                                <li><a href="home-page-two.html">Home Page 2</a></li>
+                                <li><a href="home-page-three.html">Home Page 3</a></li>
+                                <li><a href="home-page-four.html">Home Page 4</a></li>
+                                <li><a href="home-page-five.html">Home Page 5</a></li>
+                            </ul>
+                        </li>
+                        -->
+                        <li><a href="<?php echo $this->url('home') ?>" ><?php echo $this->translate('Home') ?></a></li>
+                    </ul>
+                </nav>
+                <!-- END MAIN MENU-->
+            </div>
+        </div>
+    </div>
+</div>
+<!--/PAGE HEAD-->
+
+<!--WELCOME AREA-->
+<div class="tag_line">
+    <?php echo $this->layout()->welcome_area; ?>
+</div>
+<!--/WELCOME AREA-->
