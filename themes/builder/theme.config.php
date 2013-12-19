@@ -41,10 +41,10 @@ return array(
         'layout'       => 'fullwidth',
     ),
 
-    'static_server' => array (
-        // a way to easily change assets path or web public folder, used by staticServer helper
+    'static_uri_helper' => array (
+        // a way to easily change assets path or web public folder, used by staticUri helper
         #'namespace\to\theme'   => '/assets/theme/folder',
-        'cThemes\theme\builder' => '//raya-media.com/cd/builder',
+        'yTheme\theme\builder' => '//raya-media.com/cd/builder',
     ),
     // ... }
 
@@ -80,7 +80,7 @@ return array(
     'ViewHelperManager' => array(
         // configure viewHelper, register some view helpers
         'invokables' => array (
-            'staticServer'   => 'Theme\Startup\View\Helper\StaticServer',
+            'staticUri'   => 'Theme\Startup\View\Helper\staticUri',
         ),
     ),
     */

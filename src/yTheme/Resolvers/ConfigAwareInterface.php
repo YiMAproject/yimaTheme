@@ -1,16 +1,16 @@
 <?php
-namespace cThemes\Resolvers;
+namespace yTheme\Resolvers;
 
 /**
- * Resolver classes that implement this can have cThemes configuration injected into
+ * Resolver classes that implement this can have yTheme configuration injected into
  *
  * Class ConfigAwareInterface
- * @package cThemes\Resolvers
+ * @package yTheme\Resolvers
  */
 interface ConfigAwareInterface
 {
     /**
-     * Set cThemes merged config
+     * Set yTheme merged config
      *
      * @param Array $config
      */

@@ -1,10 +1,10 @@
 <?php
-namespace cThemes\Resolvers\Layout;
+namespace yTheme\Resolvers\Layout;
 
-use cThemes\Resolvers\InterfaceClass;
-use cThemes\Resolvers\LocatorAwareInterface;
-use cThemes\Resolvers\EventAwareInterface;
-use cThemes\Theme\LocatorInterface;
+use yTheme\Resolvers\InterfaceClass;
+use yTheme\Resolvers\LocatorAwareInterface;
+use yTheme\Resolvers\EventAwareInterface;
+use yTheme\Theme\LocatorInterface;
 
 use Zend\View\Model\ModelInterface as ViewModel;
 

@@ -1,6 +1,6 @@
 <?php
-namespace cThemes;
-use cThemes\Theme\LocatorInterface;
+namespace yTheme;
+use yTheme\Theme\LocatorInterface;
 
 interface ManagerInterface
 {

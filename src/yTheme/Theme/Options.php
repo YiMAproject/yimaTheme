@@ -1,7 +1,7 @@
 <?php
-namespace cThemes\Theme;
+namespace yTheme\Theme;
 
-use cThemes\Theme\Locator;
+use yTheme\Theme\Locator;
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
 
@@ -126,8 +126,8 @@ class Options extends Locator
     {
         $themeName = $this->getName();
 
-        return (isset($this->options['cThemes']['themes'][$themeName]))
-               ? $this->options['cThemes']['themes'][$themeName]
+        return (isset($this->options['yima-ytheme']['themes'][$themeName]))
+               ? $this->options['yima-ytheme']['themes'][$themeName]
                : array();
     }
 
@@ -150,7 +150,7 @@ class Options extends Locator
             return;
         }
 
-        $this->options['cThemes']['layout_resolver_adapter'] = $options;
+        $this->options['yima-ytheme']['layout_resolver_adapter'] = $options;
     }
 
     /* Tamaami e option haaii ke baraie yek theme e khaas e konooni estefaade mishavand
@@ -167,7 +167,7 @@ class Options extends Locator
 
         $themeName = $this->getName();
 
-        $this->options['cThemes']['themes'][$themeName]['dir_path'] = $options;
+        $this->options['yima-ytheme']['themes'][$themeName]['dir_path'] = $options;
     }
 
     public function setLayoutNotfound($options)
@@ -179,7 +179,7 @@ class Options extends Locator
 
         $themeName = $this->getName();
 
-        $this->options['cThemes']['themes'][$themeName]['layout_notfound'] = $options;
+        $this->options['yima-ytheme']['themes'][$themeName]['layout_notfound'] = $options;
     }
 
     public function setLayoutException($options)
@@ -190,7 +190,7 @@ class Options extends Locator
 
         $themeName = $this->getName();
 
-        $this->options['cThemes']['themes'][$themeName]['layout_exception'] = $options;
+        $this->options['yima-ytheme']['themes'][$themeName]['layout_exception'] = $options;
     }
 
     public function setLayoutForbidden($options)
@@ -201,7 +201,7 @@ class Options extends Locator
 
         $themeName = $this->getName();
 
-        $this->options['cThemes']['themes'][$themeName]['layout_forbidden'] = $options;
+        $this->options['yima-ytheme']['themes'][$themeName]['layout_forbidden'] = $options;
     }
 
     public function setWidgets($options)
@@ -211,7 +211,7 @@ class Options extends Locator
         }
 
         $themeName = $this->getName();
-        $this->options['cThemes']['themes'][$themeName]['widgets'] = $options;
+        $this->options['yima-ytheme']['themes'][$themeName]['widgets'] = $options;
     }
 
     /* ... } */

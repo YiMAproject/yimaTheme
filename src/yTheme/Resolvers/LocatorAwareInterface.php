@@ -1,13 +1,13 @@
 <?php
-namespace cThemes\Resolvers;
+namespace yTheme\Resolvers;
 
-use cThemes\Theme\LocatorInterface;
+use yTheme\Theme\LocatorInterface;
 
 /**
  * Resolver classes that implement this can have Locator injected into
  *
  * Class LocatorAwareInterface
- * @package cThemes\Resolvers
+ * @package yTheme\Resolvers
  */
 interface LocatorAwareInterface
 {

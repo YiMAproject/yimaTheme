@@ -14,31 +14,31 @@
 
     <?php
     // set static server
-    $this->staticServer('cThemes\theme\builder');
+    $this->staticUri('yTheme\theme\builder');
 
     echo $this->headLink(
             array(
                 'rel' => 'shortcut icon',
                 'type' => 'image/vnd.microsoft.icon',
-                'href' => $this->staticServer() . '/img/favicon.ico'
+                'href' => $this->staticUri() . '/img/favicon.ico'
             )
         )
         ->prependStylesheet('http://fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C700italic%2C800italic%2C400%2C300%2C600%2C700%2C800&amp;subset=latin%2Ccyrillic-ext%2Cgreek-ext%2Cgreek%2Cvietnamese%2Clatin-ext%2Ccyrillic&amp;ver=3.4.2')
 
-        ->prependStylesheet($this->staticServer('/css/full_width_1170.css') )
-        ->prependStylesheet($this->staticServer('/css/builder.css') )
-        ->prependStylesheet($this->staticServer('/css/options.css') )                 #  ^
-        ->prependStylesheet($this->staticServer('/css/docs.css') )                    # / \
-        ->prependStylesheet($this->staticServer('/css/wide_layout.css') )             # ||
-        ->prependStylesheet($this->staticServer() . '/css/bootstrap-responsive.css')  # ||
-        ->prependStylesheet($this->staticServer() . '/css/bootstrap.css')             # ||
+        ->prependStylesheet($this->staticUri().'/css/full_width_1170.css' )
+        ->prependStylesheet($this->staticUri().'/css/builder.css' )
+        ->prependStylesheet($this->staticUri().'/css/options.css' )               #  ^
+        ->prependStylesheet($this->staticUri().'/css/docs.css' )                  # / \
+        ->prependStylesheet($this->staticUri().'/css/wide_layout.css' )           # ||
+        ->prependStylesheet($this->staticUri(). '/css/bootstrap-responsive.css')  # ||
+        ->prependStylesheet($this->staticUri(). '/css/bootstrap.css')             # ||
 
-        ->appendStylesheet($this->staticServer() . '/css/ie.css', 'screen', 'lte IE 8')
+        ->appendStylesheet($this->staticUri() . '/css/ie.css', 'screen', 'lte IE 8')
     ;
     ?>
 
     <?php echo $this->headScript()
-        ->prependFile($this->staticServer('/js/bootstrap.min.js'))
+        ->prependFile($this->staticUri().'/js/bootstrap.min.js')
 
         ->appendFile('http://html5shim.googlecode.com/svn/trunk/html5.js',   'text/javascript', array('conditional' => 'lt IE 9',))
     ; ?>
@@ -51,7 +51,7 @@
     <!--MAIN CONTENT AREA-->
     <div class="main_content_area">
         <div class="container">
-            <?php $this->staticServer(false); //reset to basePath()?>
+            <?php $this->staticUri('basePath'); //reset to basePath()?>
             <?php echo $this->content; ?>
         </div>
     </div>

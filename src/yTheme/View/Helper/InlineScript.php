@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\View\Helper;
+namespace yTheme\View\Helper;
 
 class InlineScript extends HeadScript
 {

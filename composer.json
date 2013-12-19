@@ -1,0 +1,41 @@
+{
+    "name": "rayamedia/yima-ytheme",
+    "type": "yima-core-module",
+    "description": "Professional template system, Simple, Maintainable, Extendable.",
+    "keywords": [
+        "theme",
+        "template",
+        "ui",
+        "zf2 module",
+        "yima",
+        "raya media"
+    ],
+    "authors": [
+        {
+            "name": "Payam Naderi",
+            "email": "naderi.payam@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "rayamedia/yima-plugin-installer": "dev-master"
+    },
+    "extra": {
+        "yima-plugin-name": "yTheme"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "yTheme\\" : "src/"
+        },
+        "classmap" : [
+            "./Module.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.raya-media.com/"
+        }
+    ]
+}

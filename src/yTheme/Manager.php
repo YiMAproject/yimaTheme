@@ -1,5 +1,5 @@
 <?php
-namespace cThemes;
+namespace yTheme;
 
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\SharedEventAggregateAwareInterface;
@@ -8,7 +8,7 @@ use Zend\View\Resolver as ViewResolver;
 
 use Zend\EventManager\SharedEventManager;
 
-use cThemes\Theme\LocatorInterface;
+use yTheme\Theme\LocatorInterface;
 
 use Zend\Stdlib\ResponseInterface as Response;
 use Zend\View\Model\ModelInterface as ViewModel;
@@ -51,7 +51,7 @@ class Manager implements ManagerInterface
     {
         if (! $this->themeLocator) {
             // try to get theme locator from serviceManager
-            $this->themeLocator = $this->getServiceManager()->get('cThemes\ThemeLocator');
+            $this->themeLocator = $this->getServiceManager()->get('yTheme\ThemeLocator');
         }
 
         return $this->themeLocator;
@@ -165,7 +165,7 @@ class Manager implements ManagerInterface
         // load widgets into
         $sm = $e->getApplication()->getServiceManager();
 
-        $themeProps = $sm->get('cThemes\ThemeLocator')->getOptions()->getProps();
+        $themeProps = $sm->get('yTheme\ThemeLocator')->getOptions()->getProps();
         $layout     = $viewModel->getTemplate();
 
         $areas = isset($themeProps['widgets'][$layout]) ?$themeProps['widgets'][$layout] :array();
@@ -235,7 +235,7 @@ class Manager implements ManagerInterface
 
         $viewTemplatePathStack   = $this->getServiceManager()->get('ViewTemplatePathStack');
         if (! $viewTemplatePathStack instanceof ViewResolver\TemplatePathStack) {
-            throw new \Exception('cThemes work with PathStack');
+            throw new \Exception('yTheme work with PathStack');
         }
 
         return $return;

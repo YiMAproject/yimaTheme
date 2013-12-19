@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\Theme;
+namespace yTheme\Theme;
 
 interface LocatorInterface
 {

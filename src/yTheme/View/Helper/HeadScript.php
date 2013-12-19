@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\View\Helper;
+namespace yTheme\View\Helper;
 
 use Zend\View\Helper\HeadScript as ZendHeadScript;
 
@@ -7,7 +7,7 @@ class HeadScript extends ZendHeadScript
 {
     public function toString($indent = null)
     {
-    	return '<!-- HeadScript output not allowed by cThemes. -->';
+    	return '<!-- HeadScript output not allowed by yTheme. -->';
     }
     
     /**

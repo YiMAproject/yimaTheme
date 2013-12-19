@@ -1,7 +1,7 @@
 <?php
-namespace cThemes\Resolvers\Theme;
+namespace yTheme\Resolvers\Theme;
 
-use cThemes\Resolvers\InterfaceClass;
+use yTheme\Resolvers\InterfaceClass;
 
 class Sentenced implements InterfaceClass
 {

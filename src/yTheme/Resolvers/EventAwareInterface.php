@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\Resolvers;
+namespace yTheme\Resolvers;
 
 use Zend\Mvc\MvcEvent;
 
@@ -7,7 +7,7 @@ use Zend\Mvc\MvcEvent;
  * Resolver classes that implement this can have MVCEvent injected into
  *
  * Class EventAwareInterface
- * @package cThemes\Resolvers
+ * @package yTheme\Resolvers
  */
 interface EventAwareInterface
 {

@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\View\Helper;
+namespace yTheme\View\Helper;
 
 use Zend\View\Helper\HeadLink as ZendHeadLink;
 
@@ -7,7 +7,7 @@ class HeadLink extends ZendHeadLink
 {
     public function toString($indent = null)
     {
-    	return '<!-- HeadLink output not allowed by cThemes. -->';
+    	return '<!-- HeadLink output not allowed by yTheme. -->';
     }
     
     /**

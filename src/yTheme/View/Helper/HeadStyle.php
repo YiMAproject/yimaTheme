@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\View\Helper;
+namespace yTheme\View\Helper;
 
 use Zend\View\Helper\HeadStyle as ZendHeadStyle;
 
@@ -7,7 +7,7 @@ class HeadStyle extends ZendHeadStyle
 {
     public function toString($indent = null)
     {
-    	return '<!-- HeadStyle output not allowed by cThemes. -->';
+    	return '<!-- HeadStyle output not allowed by yTheme. -->';
     }
     
     /**

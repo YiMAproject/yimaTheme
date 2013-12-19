@@ -1,15 +1,15 @@
 <?php
-namespace cThemes\Theme;
+namespace yTheme\Theme;
 
 use Zend\Mvc\MvcEvent;
 use Zend\Stdlib\ArrayUtils;
-use cThemes\Theme\LocatorInterface;
-use cThemes\Theme\Options;
+use yTheme\Theme\LocatorInterface;
+use yTheme\Theme\Options;
 
-use cThemes\Resolvers\Aggregate;
-use cThemes\Resolvers\ConfigAwareInterface;
-use cThemes\Resolvers\LocatorAwareInterface;
-use cThemes\Resolvers\EventAwareInterface;
+use yTheme\Resolvers\Aggregate;
+use yTheme\Resolvers\ConfigAwareInterface;
+use yTheme\Resolvers\LocatorAwareInterface;
+use yTheme\Resolvers\EventAwareInterface;
 
 // we want serviceManager Injected into
 use Zend\ServiceManager;
@@ -131,7 +131,7 @@ class Locator implements
                 $service = $this->getServiceLocator()->get($service);
             } else {
                 if (!class_exists($service)) {
-                    throw new \Exception("Resolver '$service' not found for cThemes.");
+                    throw new \Exception("Resolver '$service' not found for yTheme.");
                 }
 
                 $service = new $service();
@@ -191,7 +191,7 @@ class Locator implements
                 $service = $this->getServiceLocator()->get($service);
             } else {
                 if (!class_exists($service)) {
-                    throw new \Exception("Layout Resolver '$service' not found for cThemes.");
+                    throw new \Exception("Layout Resolver '$service' not found for yTheme.");
                 }
 
                 $service = new $service();
@@ -259,7 +259,7 @@ class Locator implements
     }
 
     /**
-     * get cThemes Config merged with options config
+     * get yTheme Config merged with options config
      *
      * @return Options
      */
@@ -292,7 +292,7 @@ class Locator implements
     }
 
     /**
-     * get cThemes Config merged with options config
+     * get yTheme Config merged with options config
      *
      * @return mixed
      * @throws \Exception
@@ -302,11 +302,11 @@ class Locator implements
         $sm = $this->getServiceLocator();
 
         $config = $sm->get('config');
-        if (! (isset($config['cThemes']) && is_array($config['cThemes'])) ) {
-            throw new \Exception('Not any configuration found for cThemes');
+        if (! (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) ) {
+            throw new \Exception('Not any configuration found for yTheme');
         }
 
-        return $config['cThemes'];
+        return $config['yima-ytheme'];
     }
 
     /**

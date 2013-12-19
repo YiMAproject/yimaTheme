@@ -1,18 +1,18 @@
 <?php
 return array(
-    'cThemes' => array(
+    'yima-ytheme' => array(
         'theme_name' => 'builder', // used by config name resolver
 
         'themes_default_path' => __DIR__ .DS. '..' .DS. 'themes',
 
         'theme_resolver_adapter' => array(
             // resolver instance of AbstractClass => priority
-            'cThemes\Resolvers\Theme\Config' => -1000,
-            'cThemes\Resolvers\Theme\Sentenced' => -10000, //always return default theme
+            'yTheme\Resolvers\Theme\Config' => -1000,
+            'yTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
         ),
 
         'layout_resolver_adapter' => array(
-            'cThemes\Resolvers\Layout\Error' => -10000, // inject exception layouts on 404,504,exception
+            'yTheme\Resolvers\Layout\Error' => -10000, // inject exception layouts on 404,504,exception
         ),
 
         # default layouts, can ovveride by theme specific conf.
@@ -38,7 +38,7 @@ return array(
 	'service_manager' => array(
 		'invokables' => array(
             # resolver theme name by config
-            'cThemes\Resolvers\Theme\Config' => 'cThemes\Resolvers\Theme\Config',
+            'yTheme\Resolvers\Theme\Config' => 'yTheme\Resolvers\Theme\Config',
 		),
 	),
 );

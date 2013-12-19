@@ -1,10 +1,10 @@
 <?php
-namespace cThemes\Resolvers;
+namespace yTheme\Resolvers;
 
 use Countable;
 use IteratorAggregate;
 use Zend\Stdlib\PriorityQueue;
-use cThemes\Resolvers\InterfaceClass;
+use yTheme\Resolvers\InterfaceClass;
 
 class Aggregate implements
     InterfaceClass,
@@ -19,7 +19,7 @@ class Aggregate implements
 	/**
 	 * Last Detector found in Quee
 	 * 
-	 * @var cThemes\Resolvers\InterfaceClass
+	 * @var yTheme\Resolvers\InterfaceClass
 	 */
 	protected $lastStrategyFound;
 

@@ -6,14 +6,14 @@ $this->headLink(array(
     'id'    => 'rev-google-font',
     'href'  => 'http://fonts.googleapis.com/css?family==Open+Sans:300italic,400italic,600italic,700italic,800italic,300,600,700,800'
    ))
-     ->appendStylesheet($this->staticServer('cThemes\theme\builder') . '/rs-plugin/css/responsive.css', 'screen')
-     ->appendStylesheet($this->staticServer() . '/rs-plugin/css/settings.css', 'screen')
+     ->appendStylesheet($this->staticUri('yTheme\theme\builder') . '/rs-plugin/css/responsive.css', 'screen')
+     ->appendStylesheet($this->staticUri() . '/rs-plugin/css/settings.css', 'screen')
 ;
 
 $this->headScript()
     ->prependFile('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
-    ->appendFile($this->staticServer('/rs-plugin/js/jquery.themepunch.plugins.min.js'))
-    ->appendFile($this->staticServer('/rs-plugin/js/jquery.themepunch.revolution.min.js'))
+    ->appendFile($this->staticUri().'/rs-plugin/js/jquery.themepunch.plugins.min.js')
+    ->appendFile($this->staticUri().'/rs-plugin/js/jquery.themepunch.revolution.min.js')
     ->captureStart();
 
     echo "
@@ -74,7 +74,7 @@ $this->headScript()
         <ul>
             <li data-transition="random" data-slotamount="7" data-masterspeed="300" >
 
-                <img src="<?php echo $this->staticServer();?>/images/gallery/Anchor_v1_preview2-880x461.png" >
+                <img src="<?php echo $this->staticUri();?>/images/gallery/Anchor_v1_preview2-880x461.png" >
 
                 <div class="tp-caption big_white fade"
                      data-x="550"
@@ -97,7 +97,7 @@ $this->headScript()
             </li>
 
             <li data-transition="random" data-slotamount="7" data-masterspeed="300" >
-                <img src="<?php echo $this->staticServer('cThemes\theme\builder');?>/images/gallery/1.jpg" >
+                <img src="<?php echo $this->staticUri('yTheme\theme\builder');?>/images/gallery/1.jpg" >
 
                 <div class="tp-caption fade"
                      data-x="41"
@@ -105,7 +105,7 @@ $this->headScript()
                      data-speed="300"
                      data-start="800"
                      data-easing="easeOutExpo">
-                    <img src="<?php echo $this->staticServer('cThemes\theme\builder');?>/images/gallery/ipad1.png" alt="Image 1"></div>
+                    <img src="<?php echo $this->staticUri('yTheme\theme\builder');?>/images/gallery/ipad1.png" alt="Image 1"></div>
 
                 <div class="tp-caption fade"
                      data-x="256"
@@ -113,7 +113,7 @@ $this->headScript()
                      data-speed="300"
                      data-start="1100"
                      data-easing="easeOutExpo">
-                    <img src="<?php echo $this->staticServer('cThemes\theme\builder');?>/images/gallery/ipad21.png" alt="Image 3"></div>
+                    <img src="<?php echo $this->staticUri('yTheme\theme\builder');?>/images/gallery/ipad21.png" alt="Image 3"></div>
             </li>
 
         </ul>

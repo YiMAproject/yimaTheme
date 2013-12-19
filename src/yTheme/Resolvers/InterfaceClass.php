@@ -1,5 +1,5 @@
 <?php
-namespace cThemes\Resolvers;
+namespace yTheme\Resolvers;
 
 interface InterfaceClass
 {

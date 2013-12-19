@@ -1,7 +1,7 @@
 <?php
-namespace cThemes\Resolvers\Theme;
+namespace yTheme\Resolvers\Theme;
 
-use cThemes\Resolvers\InterfaceClass;
+use yTheme\Resolvers\InterfaceClass;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -20,9 +20,9 @@ class Config implements
             $sl = $this->getServiceLocator();
 
             $config = $sl->get('config');
-            if (isset($config['cThemes']) && is_array($config['cThemes'])) {
+            if (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) {
 
-                $this->name = (isset($config['cThemes']['theme_name'])) ? $config['cThemes']['theme_name'] : false;
+                $this->name = (isset($config['yima-ytheme']['theme_name'])) ? $config['yima-ytheme']['theme_name'] : false;
             }
         }
 
