@@ -1,41 +1,40 @@
 <?php
 namespace yTheme\Resolvers\Theme;
 
-use yTheme\Resolvers\InterfaceClass;
-
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use yTheme\Resolvers\ConfigResolverAwareInterface;
+use yTheme\Resolvers\ResolverInterface;
 
 class Config implements
-    InterfaceClass,
-    ServiceLocatorAwareInterface
+    ResolverInterface,
+    ConfigResolverAwareInterface
 {
-    protected $name;
-
-    protected $servicemanager;
+    /**
+     * @var array
+     */
+    protected $config;
 
     public function getName()
     {
-        if (! $this->name /* we don`t want change theme name from first*/) {
-            $sl = $this->getServiceLocator();
+        $name = false;
 
-            $config = $sl->get('config');
-            if (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) {
+        $config = $this->config;
+        if (isset($config['theme_locator']) && is_array($config['theme_locator'])) {
 
-                $this->name = (isset($config['yima-ytheme']['theme_name'])) ? $config['yima-ytheme']['theme_name'] : false;
-            }
+            $name = (isset($config['theme_locator']['default_theme_name']))
+                ? $config['theme_locator']['default_theme_name']
+                : false;
         }
 
-        return $this->name;
+        return $name;
     }
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    /**
+     * Set yTheme merged config
+     *
+     * @param Array $config
+     */
+    public function setConfig(array $config)
     {
-        $this->servicemanager = $serviceLocator;
-    }
-
-    public function getServiceLocator()
-    {
-        return $this->servicemanager;
+        $this->config = $config;
     }
 }

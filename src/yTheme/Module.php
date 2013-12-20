@@ -2,7 +2,7 @@
 namespace yTheme;
 
 use Zend\ModuleManager\ModuleManagerInterface;
-use yTheme\Manager;
+use Zend\Mvc\MvcEvent;
 
 class Module
 {
@@ -15,10 +15,31 @@ class Module
     {
         //Theme Manager run before all on application bootstrap
         $events = $moduleManager->getEventManager()->getSharedManager();
-        //$sm     = $moduleManager->getEvent()->getParam('ServiceManager');
+        $events->attach(
+            'Zend\Mvc\Application',
+            MvcEvent::EVENT_BOOTSTRAP,
+            array($this,'initThemeManager'),
+            100000
+        );
+    }
 
-        //$sm->get('yTheme\ThemeManager');
-        $this->manager = new Manager($events);
+    /**
+     * Get Theme Manager Service and init them
+     *
+     * @param MvcEvent $e
+     */
+    public function initThemeManager(MvcEvent $e)
+    {
+        $sl = $e->getApplication()->getServiceManager();
+
+        $themManager = $sl->get('ytheme\ThemeManager');
+        if (!$themManager instanceof ManagerInterface) {
+            throw new \Exception(
+                sprintf('yTheme theme manager most instance of "ManagerInterface" but "%s" given.', get_class($themManager))
+            );
+        }
+
+        $themManager->init($e);
     }
 
     /**
@@ -31,7 +52,9 @@ class Module
     {
         return array (
             'invokables' => array (
-                'yTheme\ThemeLocator' => 'yTheme\Theme\Locator'
+                'yTheme\ThemeManager' => 'yTheme\Manager',
+                'yTheme\ThemeLocator' => 'yTheme\Theme\Locator',
+                'yTheme\ThemeObject'  => 'yTheme\Theme\Theme',
             ),
         );
     }

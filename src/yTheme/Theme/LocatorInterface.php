@@ -1,29 +1,24 @@
 <?php
 namespace yTheme\Theme;
 
+use yTheme\Theme\Theme as ThemeObject;
+use Zend\Mvc\MvcEvent;
+
 interface LocatorInterface
 {
     /**
-     * naame theme raa bar migardaanad
+     * Find Matched Theme and return object
      *
-     * @return bool|string
+     * @return ThemeObject
      */
-    public function getName();
+    public function getTheme();
 
     /**
-     * Masir folder e theme raaa bar migardaanad
+     * Get layout name according to MvcEvent on EVENT_DISPATCH
      *
-     * @return string
-     */
-    public function getPathName();
-
-
-    /**
-     * Name of layout to render.
-     * It get by Manager and inject into MVC
+     * @param MvcEvent $e
      *
      * @return mixed
      */
-    public function getLayout();
-
+    public function getMvcLayout(MvcEvent $e);
 }

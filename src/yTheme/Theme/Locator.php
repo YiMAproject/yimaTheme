@@ -1,24 +1,31 @@
 <?php
 namespace yTheme\Theme;
 
+use yTheme\Resolvers\ConfigResolverAwareInterface;
+use yTheme\Resolvers\LocatorResolverAwareInterface;
+use yTheme\Resolvers\MvcResolverAwareInterface;
 use Zend\Mvc\MvcEvent;
-use Zend\Stdlib\ArrayUtils;
-use yTheme\Theme\LocatorInterface;
-use yTheme\Theme\Options;
 
 use yTheme\Resolvers\Aggregate;
-use yTheme\Resolvers\ConfigAwareInterface;
-use yTheme\Resolvers\LocatorAwareInterface;
-use yTheme\Resolvers\EventAwareInterface;
 
-// we want serviceManager Injected into
 use Zend\ServiceManager;
-use Zend\ServiceManager\Config as ServiceConfig;
 
 class Locator implements
-    LocatorInterface,
+    LocatorDefaultInterface,
     ServiceManager\ServiceLocatorAwareInterface
 {
+    /**
+     * Default Manager theme_locator config
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var
+     */
+    protected $themeObject;
+
     /**
      * Name of template
      *
@@ -27,162 +34,77 @@ class Locator implements
     protected $name;
 
     /**
-     * @var Options
-     */
-    protected $options;
-
-    /**
      * @var ServiceManager\ServiceLocatorInterface
      */
     protected $serviceManager;
 
-    protected $initialized = false;
-
-    public function initialize()
+    public function init()
     {
-        if ($this->initialized) {
-            return;
-        }
-
-        $options = $this->getOptions()->toArray();
-
-        // autoload
-        if (is_array($options['autoloader'])) {
-            \Zend\Loader\AutoloaderFactory::factory($options['autoloader']);
-        }
-
-        // configure services registered in serviceManager
-        $services = array();
-        foreach ($options as $key=>$val) {
-            if ($this->getServiceLocator()->has($key)) {
-                // theme config key is a registered service
-                $service = $this->getServiceLocator()->get($key);
-                if ($service instanceof ServiceManager\ServiceLocatorInterface) {
-                    $services[] = $key;
-                    $serviceConfig = new ServiceConfig($val);
-                    $serviceConfig->configureServiceManager($service);
-                }
-            }
-        }
-
-        // merge theme options to application merged config
-        unset($options['autoloader']);
-
-        foreach ($options as $key=>$val) {
-            if ( in_array($key, $services) ) {
-                unset($options[$key]);
-                continue;
-            }
-
-            $callSetMethod = 'set'. str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this->getOptions(), $callSetMethod)) {
-                unset($options[$key]);
-            }
-        }
-
-        $serviceManager = $this->getServiceLocator();
-        $mergdConf = $serviceManager->get('Config');
-        $config = ArrayUtils::merge($mergdConf, $options);
-
-        $serviceManager->setAllowOverride(true);
-        $serviceManager->setService('config',$config);
-        $serviceManager->setAllowOverride(false);
-
-        $this->initialized = true;
-        return $this;
+        // by getting theme also we initialize theme
+        // to theme options to work
+        $this->getTheme();
     }
 
     /**
-     * Ba tavajoh be resolver haa dar config, naame theme raa
-     * tashkhis midahad.
+     * Find Matched Theme and return object
      *
-     * @return bool|string
-     * @throws \Exception
+     * @return ThemeObject
      */
-    public function getName()
+    public function getTheme()
     {
-        if ($this->name) {
-            return $this->name;
+        if (isset($this->themeObject)) {
+            return $this->themeObject;
         }
 
-        // get template name {
-        $config = $this->getModuleConfig();
-        if (!isset($config['theme_resolver_adapter'])) {
-            throw new \Exception('No resolver adapter defined for cTheme.');
-        } else {
-            $config = $config['theme_resolver_adapter'];
-            if (!is_array($config)) {
-                if ($config instanceof \Iterator) {
-                    $config = ArrayUtils::iteratorToArray($config);
-                }
-
-                // is string
-                if (is_string($config)) {
-                    $config = array(
-                        "{$config}" => 1
-                    );
-                }
-            }
+        $themeObject = $this->getServiceLocator()
+            ->get('yTheme\ThemeObject');
+        if (! $themeObject instanceof Theme) {
+            throw new \Exception(
+                sprintf(
+                    'yTheme\ThemeObject must instanceof "\yTheme\Theme\Them" but "%s" given.',
+                    get_class($themeObject)
+                )
+            );
         }
 
-        $nameResolver = new Aggregate();
-        foreach ($config as $service=>$priority) {
-            if ($this->getServiceLocator()->has($service)) {
-                $service = $this->getServiceLocator()->get($service);
-            } else {
-                if (!class_exists($service)) {
-                    throw new \Exception("Resolver '$service' not found for yTheme.");
-                }
+        $themeObject->setName($this->attainThemeName());
+        $themeObject->setThemesPath($this->attainPathName());
 
-                $service = new $service();
-            }
-
-            if ($service instanceof ConfigAwareInterface) {
-                // set cTheme config for resolver
-                $service->setConfig($this->getModuleConfig());
-            }
-
-            $nameResolver->attach($service,$priority);
+        if (method_exists($themeObject, 'initialize')) {
+            // initialize theme object
+            $themeObject->initialize();
         }
 
-        $themeName = $nameResolver->getName();
-
-        if (empty($themeName) && ! ($themeName === '0') ) {
-            /**
-             * @TODO attention or log to developer
-             */
-
-            return false;
-            //throw new \Exception('Can`t resolve to theme name.');
-        }
-        // ... }
-
-        return $this->name = $themeName;
+        return $themeObject;
     }
 
     /**
-     * Name of layout to render.
-     * It get by Manager and inject into MVC
+     * Get layout name according to MvcEvent on EVENT_DISPATCH
+     *
+     * @param MvcEvent $e
      *
      * @return mixed
      */
-    public function getLayout()
+    public function getMvcLayout(MvcEvent $e)
     {
-        $config = $this->getModuleConfig();
-        if (isset($config['layout_resolver_adapter'])) {
-            $config = $config['layout_resolver_adapter'];
-            if (! is_array($config) ) {
-                if ($config instanceof \Iterator) {
-                    $config = ArrayUtils::iteratorToArray($config);
-                }
+        $config = $this->getConfig();
+        if (isset($config['theme_locator'])) {
+            $config = $config['theme_locator'];
+        } else {
+            $config = array();
+        }
 
-                // is string
-                if (is_string($config)) {
-                    $config = array(
-                        "{$config}" => 1
-                    );
-                }
-            }
+        if (isset($config['mvclayout_resolver_adapter'])) {
+            $config = $config['mvclayout_resolver_adapter'];
+        } else {
+            throw new \Exception('No "mvclayout_resolver_adapter" config key found on ThemeLocator config.');
+        }
+
+        // is string
+        if (is_string($config)) {
+            $config = array(
+                "{$config}" => 1
+            );
         }
 
         $nameResolver = new Aggregate();
@@ -197,23 +119,18 @@ class Locator implements
                 $service = new $service();
             }
 
-            if ($service instanceof ConfigAwareInterface) {
-                // set cTheme config for resolver
-                $service->setConfig($this->getModuleConfig());
+            if ($service instanceof LocatorResolverAwareInterface) {
+                // inject themeLocator to access config and other things by resolver
+                $service->setThemeLocator($this);
             }
 
-            if ($service instanceof LocatorAwareInterface) {
-                // set cTheme config for resolver
-                $service->setLocator($this);
+            if ($service instanceof ConfigResolverAwareInterface) {
+                // set yTheme config for resolver
+                $service->setConfig($this->getConfig());
             }
 
-            if ($service instanceof EventAwareInterface) {
-                // set cTheme config for resolver
-                $e = $this->getOptions()->getParam('MvcEvent');
-                if (!$e instanceof MvcEvent ) {
-                    throw new \Exception('MvcEvent need for layout resolver but not exists.');
-                }
-                $service->setEvent($e);
+            if ($service instanceof MvcResolverAwareInterface) {
+                $service->setMvcEvent($e);
             }
 
             $nameResolver->attach($service,$priority);
@@ -222,31 +139,91 @@ class Locator implements
         $layout = $nameResolver->getName();
 
         if (empty($layout) && ! ($layout === '0') ) {
-            return;
+            return false;
         }
 
         return $layout;
     }
 
+
     /**
-     * Masir folder e theme raaa bar migardaanad
+     * Resolve to theme name by Aggregate services
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    protected function attainThemeName()
+    {
+        $config = $this->getConfig();
+
+        if (isset($config['theme_locator'])) {
+            $config = $config['theme_locator'];
+        } else {
+            $config = array();
+        }
+
+        if (!isset($config['resolver_adapter_service'])) {
+            throw new \Exception('Theme Resolver Service not present in config[resolver_adapter_service].');
+        }
+
+        $config = $config['resolver_adapter_service'];
+        // is string, 'resolver_adapter' => 'resolver\service'
+        if (is_string($config)) {
+            $config = array(
+                "{$config}" => 1
+            );
+        }
+
+        $nameResolver = new Aggregate();
+        foreach ($config as $service => $priority)
+        {
+            if ($this->getServiceLocator()->has($service)) {
+                $service = $this->getServiceLocator()->get($service);
+            } else {
+                if (!class_exists($service)) {
+                    throw new \Exception("Resolver '$service' not found for yTheme.");
+                }
+
+                $service = new $service();
+            }
+
+            if ($service instanceof LocatorResolverAwareInterface) {
+                // inject themeLocator to access config and other things by resolver
+                $service->setThemeLocator($this);
+            }
+
+            if ($service instanceof ConfigResolverAwareInterface) {
+                // set yTheme config for resolver
+                $service->setConfig($this->getConfig());
+            }
+
+            $nameResolver->attach($service,$priority);
+        }
+
+        $themeName = $nameResolver->getName();
+
+        return (empty($themeName) && ! ($themeName === '0')) ? false : $themeName;
+    }
+
+    /**
+     * Get themes folder dir from config
      *
      * @return string
      */
-    public function getPathName()
+    protected function attainPathName()
     {
-        $themeName = $this->getName();
+        $path = false;
 
-        $config = $this->getModuleConfig();
-        // get default directory path to themes folder {
-        if (isset($config['themes_default_path'])) {
-            $themesDefaultPath = $config['themes_default_path'];
+        // get default themes path by config {
+        $config = $this->getConfig();
+        if (isset($config['theme_locator']['themes_default_path'])) {
+            $path = $config['theme_locator']['themes_default_path'];
         }
-
-        $path = (isset($themesDefaultPath)) ? $themesDefaultPath .DS. $themeName : false;
         // ... }
 
-        // get theme specify path, use case in modules that present a specify theme inside, like admin panel.
+        // get theme specify path,
+        // use case in modules that present a specify theme inside, like admin panel.
+        $themeName = $this->attainThemeName();
         if (isset($config['themes']) && is_array($config['themes'])
             && isset($config['themes'][$themeName]))
         {
@@ -255,58 +232,32 @@ class Locator implements
             }
         }
 
-        return realpath($path);
+        return $path;
     }
 
     /**
-     * get yTheme Config merged with options config
+     * Set Manager config
+     * used by themeLocator
      *
-     * @return Options
+     * @param array $config
+     *
+     * @return $this
      */
-    public function getOptions()
+    public function setConfig($config)
     {
-        if (! $this->options) {
-            $this->options = new Options($this);
-        }
+        $this->config = $config;
 
-        return $this->options;
+        return $this;
     }
 
     /**
-     * Mostaghiman file e marboot be option haaie theme raa mikhaanad
+     * Get default Manager theme_locator config
      *
      * @return array
      */
-    protected function getOptionsFromFile()
+    public function getConfig()
     {
-        $themeConf = array();
-
-        $configFile = rtrim($this->getPathName(), DS).DS.'theme.config.php';
-        if (file_exists($configFile))
-        {
-            $themeConf = include $configFile;
-            $themeConf = (is_array($themeConf)) ? $themeConf : array();
-        }
-
-        return $themeConf;
-    }
-
-    /**
-     * get yTheme Config merged with options config
-     *
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function getModuleConfig()
-    {
-        $sm = $this->getServiceLocator();
-
-        $config = $sm->get('config');
-        if (! (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) ) {
-            throw new \Exception('Not any configuration found for yTheme');
-        }
-
-        return $config['yima-ytheme'];
+        return $this->config;
     }
 
     /**
@@ -328,5 +279,4 @@ class Locator implements
     {
         return $this->serviceManager;
     }
-
 }

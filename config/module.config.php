@@ -1,30 +1,39 @@
 <?php
 return array(
     'yima-ytheme' => array(
-        'theme_name' => 'builder', // used by config name resolver
+        'theme_locator' => array(
+            /*
+             * Resolve to the theme and return theme object to locator
+             *
+             * also can used as once, like:
+             * 'resolver_adapter' => 'resolver\service'
+             */
+            'resolver_adapter_service' => array(
+                // resolver => priority
+                'yTheme\Resolvers\Theme\Config' => -1000,
+                'yTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
+            ),
+            'default_theme_name'  => 'builder', // used by yTheme\Resolvers\Theme\Config
+            'themes_default_path' => __DIR__ .DS. '..' .DS. 'themes',
 
-        'themes_default_path' => __DIR__ .DS. '..' .DS. 'themes',
+            // .............................................................................................
 
-        'theme_resolver_adapter' => array(
-            // resolver instance of AbstractClass => priority
-            'yTheme\Resolvers\Theme\Config' => -1000,
-            'yTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
+            'mvclayout_resolver_adapter' => array(
+                'yTheme\Resolvers\Layout\Error' => -10000, // inject exception layouts on 404,504,exception
+            ),
+            # default layouts, can override by theme specific conf.
+            // used by yTheme\Resolvers\Layout\Error
+            'layout_notfound'  => '404',
+            'layout_exception' => 'error',
+            'layout_forbidden' => 'forbidden',
         ),
-
-        'layout_resolver_adapter' => array(
-            'yTheme\Resolvers\Layout\Error' => -10000, // inject exception layouts on 404,504,exception
-        ),
-
-        # default layouts, can ovveride by theme specific conf.
-        'layout_notfound'  => 'notfound',
-        'layout_exception' => 'error',
-        'layout_forbidden' => 'forbidden',
 
         // tanzimat e makhsoos be har template dar injaa gharaar migirad
         'themes' => array(
             'builder' => array(
                 # u can change this theme to another folder.(realpath returned automatically)
-                'dir_path' => __DIR__ .DS. '..' .DS. 'themes' .DS. 'builder',
+                # in this folder folder with builder (name of theme) must found.
+                'dir_path' => __DIR__ .DS. '..' .DS. 'themes',
 
                 /* also can change within theme.config.php file
                 'layout_notfound'  => '404',
@@ -36,6 +45,7 @@ return array(
     ),
 
 	'service_manager' => array(
+        // attention: some services registered via Module::getServiceConfig
 		'invokables' => array(
             # resolver theme name by config
             'yTheme\Resolvers\Theme\Config' => 'yTheme\Resolvers\Theme\Config',

@@ -1,9 +1,10 @@
 <?php
 namespace yTheme\Resolvers\Theme;
 
-use yTheme\Resolvers\InterfaceClass;
+use yTheme\Resolvers\ResolverInterface;
 
-class Sentenced implements InterfaceClass
+class Sentenced implements
+    ResolverInterface
 {
    protected $name = 'builder';
 

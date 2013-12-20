@@ -1,10 +1,14 @@
 <?php
 namespace yTheme;
-use yTheme\Theme\LocatorInterface;
+
+use Zend\Mvc\MvcEvent;
 
 interface ManagerInterface
 {
-    public function setThemeLocator(LocatorInterface $locator);
-
-    public function getThemeLocator();
+    /**
+     * Init Theme Manager To Work
+     *
+     * @return mixed
+     */
+    public function init(MvcEvent $e);
 }

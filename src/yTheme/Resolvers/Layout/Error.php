@@ -1,10 +1,9 @@
 <?php
 namespace yTheme\Resolvers\Layout;
 
-use yTheme\Resolvers\InterfaceClass;
-use yTheme\Resolvers\LocatorAwareInterface;
-use yTheme\Resolvers\EventAwareInterface;
-use yTheme\Theme\LocatorInterface;
+use yTheme\Resolvers\ResolverInterface;
+use yTheme\Resolvers\MvcResolverAwareInterface;
+use yTheme\Resolvers\ConfigResolverAwareInterface;
 
 use Zend\View\Model\ModelInterface as ViewModel;
 
@@ -16,32 +15,36 @@ use Zend\Mvc\MvcEvent;
  *
  */
 class Error implements
-    InterfaceClass,
-    LocatorAwareInterface,
-    EventAwareInterface
+    ResolverInterface,
+    MvcResolverAwareInterface,
+    ConfigResolverAwareInterface
 {
-    protected $name;
+    /**
+     * @var array
+     */
+    protected $config;
 
-    protected $locator;
-
-    protected $event;
+    /**
+     * @var MvcEvent
+     */
+    protected $mvcEvent;
 
     public function getName()
     {
-        $e = $this->getEvent();
+        $e = $this->mvcEvent;
 
         $model = $e->getResult();
         if (!$model instanceof ViewModel) {
-            return;
+            return false;
         }
 
         $response = $e->getResponse();
 
         if ( $response->isSuccess() || $response->isOk() ) {
-            return;
+            // inject layout only if error happens
+            return false;
         }
 
-        $template = '';
         // detect theme config key by exception mode
         $confKey  = ($response->isServerError()) ? 'layout_exception'
             :( ($response->isNotFound()) ? 'layout_notfound'
@@ -50,20 +53,17 @@ class Error implements
 
         ;
 
-        // get theme specific layout name by exception mode
-        $config = $this->getLocator()->getOptions()->getProps();
-
-        // get layout specific name from theme config
-        if ($config) {
-            $template = array_key_exists($confKey,$config)
-                ? $config[$confKey]
-                : '';
+        // get config
+        $config = $this->config;
+        if (is_array($config) && isset($config['theme_locator'])) {
+            $config = $config['theme_locator'];
+        } else {
+            $config = array();
         }
 
-        if (isset($config[$confKey]) && empty($template)) {
-            // get default specific layouts
-            $template = $config[$confKey];
-        }
+        $template = array_key_exists($confKey, $config)
+            ? $config[$confKey]
+            : false;
 
         /* Move this out of here
          * if (! empty($template))
@@ -89,23 +89,18 @@ class Error implements
         return (! empty($template)) ? $template : false;
     }
 
-    public function setLocator(LocatorInterface $manager)
+    public function setMvcEvent(MvcEvent $e)
     {
-        $this->locator = $manager;
+        $this->mvcEvent = $e;
     }
 
-    public function getLocator()
+    /**
+     * Set yTheme merged config
+     *
+     * @param Array $config
+     */
+    public function setConfig(array $config)
     {
-        return $this->locator;
-    }
-
-    public function setEvent(MvcEvent $event)
-    {
-        $this->event = $event;
-    }
-
-    public function getEvent()
-    {
-        return $this->event;
+        $this->config = $config;
     }
 }

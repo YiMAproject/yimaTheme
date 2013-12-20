@@ -4,10 +4,9 @@ namespace yTheme\Resolvers;
 use Countable;
 use IteratorAggregate;
 use Zend\Stdlib\PriorityQueue;
-use yTheme\Resolvers\InterfaceClass;
 
 class Aggregate implements
-    InterfaceClass,
+    ResolverInterface,
 	Countable,
 	IteratorAggregate
 {
@@ -19,7 +18,7 @@ class Aggregate implements
 	/**
 	 * Last Detector found in Quee
 	 * 
-	 * @var yTheme\Resolvers\InterfaceClass
+	 * @var ResolverInterface
 	 */
 	protected $lastStrategyFound;
 
@@ -81,7 +80,7 @@ class Aggregate implements
 	 * Attach a name resolver strategy
 	 *
 	 */
-	public function attach(InterfaceClass $detector, $priority = 1)
+	public function attach(ResolverInterface $detector, $priority = 1)
 	{
 		$this->queue->insert($detector, $priority);
 		return $this;

@@ -59,32 +59,7 @@ class Options extends Locator
         return $this;
     }
 
-    /**
-     * Used for passing some params variable between each action during MvcEvents.
-     *
-     *  zmani hast ke manager ehtiaj daarad maghaadiri raa be locator ersaal konad
-     *  va nesbat be aaan amaliaat anjaam shavad, masalan hengaame render MvcEvent
-     *  ehtiaj ast baraaie shenaakhte layout.
-     *
-     * @param $name
-     * @param $value
-     * @return $this
-     */
-    public function setParam($name, $value)
-    {
-        $name = strtolower($name);
 
-        $this->params[$name] = $value;
-
-        return $this;
-    }
-
-    public function getParam($name)
-    {
-        $name = strtolower($name);
-
-        return (isset($this->params[$name])) ? $this->params[$name] : null;
-    }
 
     /**
      * Get a configuration property

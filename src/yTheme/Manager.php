@@ -1,29 +1,34 @@
 <?php
 namespace yTheme;
 
+use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\SharedEventAggregateAwareInterface;
 use Zend\ServiceManager\ServiceManager;
+use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\View\Resolver as ViewResolver;
 
 use Zend\EventManager\SharedEventManager;
 
 use yTheme\Theme\LocatorInterface;
+use yTheme\Theme\LocatorDefaultInterface;
 
 use Zend\Stdlib\ResponseInterface as Response;
 use Zend\View\Model\ModelInterface as ViewModel;
 
-class Manager implements ManagerInterface
+class Manager implements
+    ManagerInterface,
+    ServiceManagerAwareInterface,
+    EventManagerAwareInterface
 {
-    protected $isInitialized = false;
-
     /**
      * @var ServiceManager
      */
     protected $serviceManager;
 
     /*
-     * @var SharedEventManager
+     * @var EventManagerInterface
      */
     protected $events;
 
@@ -32,41 +37,40 @@ class Manager implements ManagerInterface
      */
     protected $themeLocator;
 
-    public function __construct(SharedEventManager $events, LocatorInterface $themeLocator = null)
+    protected $isInitialized;
+
+    /**
+     * Init Theme Manager To Work
+     *
+     * This is call before all on application bootstrap
+     *
+     * @return mixed
+     */
+    public function init(MvcEvent $e)
     {
-        if (isset($themeLocator)) {
-            $this->setThemeLocator($themeLocator);
+        if ($this->isInitialized()) {
+            return true;
         }
 
-        $this->events = $events;
+        // atach default listeners
         $this->attachDefaultListeners();
-    }
-
-    public function setThemeLocator(LocatorInterface $themeLocator)
-    {
-        $this->themeLocator = $themeLocator;
-    }
-
-    public function getThemeLocator()
-    {
-        if (! $this->themeLocator) {
-            // try to get theme locator from serviceManager
-            $this->themeLocator = $this->getServiceManager()->get('yTheme\ThemeLocator');
+        if (method_exists($this->getThemeLocator(), 'init')) {
+            $this->getThemeLocator()->init();
         }
 
-        return $this->themeLocator;
+        $this->isInitialized = true;
+
+        return $this;
     }
 
     /**
      * Register the default event listeners
      *
+     * Set of events that bring template on screen
      */
     protected function attachDefaultListeners()
     {
-        $events = $this->getEventManager();
-
-        // themes are loaded before bootstrap viewManager to load theme config first
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this,'initialize'),100000);
+        $events = $this->getEventManager()->getSharedManager();
 
         // we need pathstack initialized before injecting spec layouts
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
@@ -75,33 +79,62 @@ class Manager implements ManagerInterface
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
 
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this,'widgetIt'),-1000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this,'widgetizeIt'),-1000);
+
     }
 
     /**
-     * Theme raa tashkhis midahad
-     * config haaye aan raa load va raah andaazi mikonad
+     * Get ThemeLocator
      *
-     * @param MvcEvent $e
-     * @return bool
+     * @return LocatorInterface
      */
-    public function initialize(MvcEvent $e)
+    public function getThemeLocator()
     {
-        if ($this->isInitialized()) {
-            return false;
+        if (! $this->themeLocator) {
+            // use default theme locator to resolve theme object
+            $this->themeLocator = $this->getDefaultThemeLocator();
         }
 
-        $serviceManager = $e->getApplication()->getServiceManager();
-        $this->setServiceManager($serviceManager);
+        return $this->themeLocator;
+    }
 
-        $themeLocator = $this->getThemeLocator();
-        if (method_exists($themeLocator,'initialize')) {
-            $themeLocator->initialize();
+    /**
+     * Set ThemeLocator
+     *
+     * @param LocatorInterface $themeLocator
+     */
+    public function setThemeLocator(LocatorInterface $themeLocator)
+    {
+        $this->themeLocator = $themeLocator;
+    }
+
+    /**
+     * Get Default Theme Locator for registered services in serviceManager
+     *
+     * @return Theme\Locator
+     * @throws \Exception
+     */
+    protected function getDefaultThemeLocator()
+    {
+        /** @var $defaultThemeLocator \yTheme\Theme\Locator */
+        $defaultThemeLocator = $this->getServiceManager()->get('yTheme\ThemeLocator');
+        if (!$defaultThemeLocator instanceof LocatorDefaultInterface) {
+            throw new \Exception(
+                'Default Theme Locator Service (yTheme\ThemeLocator) must instance of yTheme\Theme\LocatorDefaultInterface'
+            );
         }
 
-        $this->isInitialized = true;
+        // get default manager config used by default theme locator
+        $config = $this->getServiceManager()->get('config');
+        if (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) {
+            $config = $config['yima-ytheme'];
+        } else {
+            $config = array();
+        }
 
-        return $this;
+        $defaultThemeLocator->setConfig($config);
+
+        return $defaultThemeLocator;
     }
 
     // Event Methods ..................................................................................
@@ -112,26 +145,27 @@ class Manager implements ManagerInterface
      * @param MvcEvent $e
      * @throws \Exception
      */
-    public function addThemePathstack(MvcEvent $e)
+    public function addThemePathstack(MvcEvent $e = null)
     {
-        if (! $this->isInitialized() ) {
-            return;
-        }
-
         $this->checkMVC(); // test application startup config to match our need
 
-        $path = $this->getThemeLocator()->getPathName();
+        $theme = $this->getThemeLocator()->getTheme();
 
-        $viewTemplatePathStack = $this->getServiceManager()->get('ViewTemplatePathStack');
+        $path = $theme->getThemesPath();
+        $path = $path .DS. $theme->getName();
+
+        $sl = ($e) ? $e->getApplication()->getServiceManager() : $this->getServiceManager();
+        $viewTemplatePathStack = $sl->get('ViewTemplatePathStack');
         $viewTemplatePathStack->addPath($path);
     }
 
+    /**
+     * Change layout
+     *
+     * @param MvcEvent $e
+     */
     public function injectSpecLayout(MvcEvent $e)
     {
-        if (! $this->isInitialized() ) {
-            return;
-        }
-
         $model = $e->getResult();
         if (! $model instanceof ViewModel ) {
             return;
@@ -141,16 +175,20 @@ class Manager implements ManagerInterface
         $this->addThemePathstack($e);
 
         // get Layout from Locator
-        $this->getThemeLocator()->getOptions()->setParam('MvcEvent', $e);
-        $layout = $this->getThemeLocator()->getLayout();
+        $layout = $this->getThemeLocator()->getMvcLayout($e);
+        if ($layout != $this->getThemeLocator()->getTheme()->getLayout()) {
+            // we wan't same on theme layout name if not set
+            $this->getThemeLocator()->getTheme()->setLayout($layout);
+        }
 
         if ($layout) {
             $model = $e->getViewModel();
             $model->setTemplate($layout);
         }
+        // else { let other events do somethings .... }
     }
 
-    public function widgetIt(MvcEvent $e)
+    public function widgetizeIt(MvcEvent $e)
     {
         $result = $e->getResult();
         if ($result instanceof Response) {
@@ -162,13 +200,12 @@ class Manager implements ManagerInterface
             return;
         }
 
-        // load widgets into
-        $sm = $e->getApplication()->getServiceManager();
+        // load widgets into {
+        $themeLocator = $this->getThemeLocator();
 
-        $themeProps = $sm->get('yTheme\ThemeLocator')->getOptions()->getProps();
-        $layout     = $viewModel->getTemplate();
-
-        $areas = isset($themeProps['widgets'][$layout]) ?$themeProps['widgets'][$layout] :array();
+        $config       = $themeLocator->getConfig();
+        $layout       = $viewModel->getTemplate();
+        $areas = isset($config['widgets'][$layout]) ? $config['widgets'][$layout] : array();
         foreach($areas as $area => $widgets)
         {
             if (! is_array($widgets) ) {
@@ -224,15 +261,6 @@ class Manager implements ManagerInterface
             $return = false;
         }
 
-        if (! $return) {
-            // $message = 'default resolver change and codes may not work correctly';
-
-            // ...
-            // log or attention to developer.
-
-        }
-        // ... }
-
         $viewTemplatePathStack   = $this->getServiceManager()->get('ViewTemplatePathStack');
         if (! $viewTemplatePathStack instanceof ViewResolver\TemplatePathStack) {
             throw new \Exception('yTheme work with PathStack');
@@ -252,16 +280,6 @@ class Manager implements ManagerInterface
     }
 
     /**
-     * Retrieve the event manager
-     *
-     * @return SharedEventAggregateAwareInterface
-     */
-    public function getEventManager()
-    {
-        return $this->events;
-    }
-
-    /**
      * Set service manager
      *
      * @param ServiceManager $serviceManager
@@ -271,13 +289,40 @@ class Manager implements ManagerInterface
         $this->serviceManager = $serviceManager;
     }
 
+    /**
+     * Get serviceManager
+     *
+     * @return ServiceManager
+     *
+     * @throws \Exception
+     */
     public function getServiceManager()
     {
         if (! $this->serviceManager) {
-            throw new \Exception('ServiceManager not set yet!');
+            throw new \Exception('ServiceManager not injected and not exists.');
         }
 
         return $this->serviceManager;
     }
 
+    /**
+     * Inject an EventManager instance
+     *
+     * @param  EventManagerInterface $eventManager
+     * @return void
+     */
+    public function setEventManager(EventManagerInterface $eventManager)
+    {
+        $this->events = $eventManager;
+    }
+
+    /**
+     * Retrieve the event manager
+     *
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        return $this->events;
+    }
 }

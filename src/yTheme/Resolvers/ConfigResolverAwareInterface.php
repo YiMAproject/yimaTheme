@@ -7,7 +7,7 @@ namespace yTheme\Resolvers;
  * Class ConfigAwareInterface
  * @package yTheme\Resolvers
  */
-interface ConfigAwareInterface
+interface ConfigResolverAwareInterface
 {
     /**
      * Set yTheme merged config
@@ -15,11 +15,4 @@ interface ConfigAwareInterface
      * @param Array $config
      */
     public function setConfig(array $config);
-
-    /**
-     * Get config
-     *
-     * @return array
-     */
-    public function getConfig();
 }
