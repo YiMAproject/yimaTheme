@@ -74,52 +74,91 @@ class Theme implements
 
         $options = $this->getOptions();
 
+        // ===============================================================================================
+
+        $systemConfigs = (isset($options['application'])) ? $options['application'] : array();
+
         // autoloader initial {
-        if (is_array($options['autoloader'])) {
-            \Zend\Loader\AutoloaderFactory::factory($options['autoloader']);
+        if (is_array($systemConfigs['autoloader'])) {
+            \Zend\Loader\AutoloaderFactory::factory($systemConfigs['autoloader']);
         }
-        unset($options['autoloader']);
+        unset($systemConfigs['autoloader']);
         // ... }
 
         // configure services registered in serviceManager {
-        $services = array();
-        foreach ($options as $key => $val) {
+        foreach ($systemConfigs as $key => $val) {
             if ($this->serviceManager->has($key)) {
                 // theme config key is a registered service
                 $service = $this->serviceManager->get($key);
                 if ($service instanceof ServiceLocatorInterface) {
-                    $services[] = $key;
                     $serviceConfig = new Config($val);
                     $serviceConfig->configureServiceManager($service);
+
+                    unset($systemConfigs[$key]);
                 }
             }
         }
         // ... }
+        #  all config left behind merge with modules merged config
+        // this not sounds good {
+        if (isset($options['application'])) {
+            unset($options['application']);
+        }
+        // ... }
 
+        // =========================================================================================
 
-        foreach ($options as $key=>$val) {
-            // clean up config from services key
-            if (in_array($key, $services)) {
-                // this is service manager key
-                unset($options[$key]);
-                continue;
-            }
+        if (isset($options['theme_locator'])) {
+            // merge theme_locator to merged config
+            $systemConfigs = ArrayUtils::merge(
+                $systemConfigs,
+                array(
+                    'yima-ytheme' => array(
+                        'theme_locator' => $options['theme_locator']
+                    )
+                )
+            );
 
-            // SET SPECIFIC THEME OPTIONS BY CONFIG
-            /*$callSetMethod = 'set'. str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+            unset($options['theme_locator']);
+        }
+
+        foreach ($options as $key => $val) {
+            // SET SPECIFIC SETTER THEME OPTIONS BY CONFIG
+            $callSetMethod = 'set'. str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
             if (method_exists($this->getOptions(), $callSetMethod)) {
                 unset($options[$key]);
-            }*/
+            }
         }
+
+        #  all config left behind merge with modules merged config
+        $themeName = $this->getName();
+        $systemConfigs = ArrayUtils::merge(
+            $systemConfigs,
+            array(
+                'yima-ytheme' => array(
+                    'themes' => array(
+                        $themeName => $options
+                    )
+                )
+            )
+        );
+
+        // ----------------------------------------------------------------------------------------
 
         // merge theme options to application merged config {
         $serviceManager = $this->serviceManager;
-        $mergdConf = $serviceManager->get('Config');
-        $config = ArrayUtils::merge($mergdConf, $options);
+
+        $mergedConf     = $serviceManager->get('Config');
+        $config         = ArrayUtils::merge($mergedConf, $systemConfigs);
 
         $serviceManager->setAllowOverride(true);
         $serviceManager->setService('config',$config);
         $serviceManager->setAllowOverride(false);
+
+        # get back options to locator
+        $serviceManager->get('yTheme\ThemeLocator')
+            ->setConfig($config['yima-ytheme']);
+
         // ... }
 
         $this->initialized = true;

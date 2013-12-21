@@ -29,6 +29,8 @@ return array(
         ),
 
         // tanzimat e makhsoos be har template dar injaa gharaar migirad
+        # Note: after including current detected theme specific config, -
+        # config with theme name merged here ...
         'themes' => array(
             'builder' => array(
                 # u can change this theme to another folder.(realpath returned automatically)
