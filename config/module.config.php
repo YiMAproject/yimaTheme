@@ -14,7 +14,9 @@ return array(
                 'yTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
             ),
             'default_theme_name'  => 'builder', // used by yTheme\Resolvers\Theme\Config
-            'themes_default_path' => __DIR__ .DS. '..' .DS. 'themes',
+            'themes_default_path' => (defined(APP_DIR_APPLICATION))
+                    ? APP_DIR_APPLICATION .DS. 'themes' // used in Yima
+                    : 'your_path_to_themes',
 
             // .............................................................................................
 
@@ -36,12 +38,6 @@ return array(
                 # u can change this theme to another folder.(realpath returned automatically)
                 # in this folder folder with builder (name of theme) must found.
                 'dir_path' => __DIR__ .DS. '..' .DS. 'themes',
-
-                /* also can change within theme.config.php file
-                'layout_notfound'  => '404',
-                'layout_exception' => 'error',
-                'layout_forbidden' => 'forbidden',
-                */
             ),
         ),
     ),

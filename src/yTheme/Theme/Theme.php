@@ -102,6 +102,7 @@ class Theme implements
         #  all config left behind merge with modules merged config
         // this not sounds good {
         if (isset($options['application'])) {
+            // application configuration done, unset application
             unset($options['application']);
         }
         // ... }
@@ -122,10 +123,13 @@ class Theme implements
             unset($options['theme_locator']);
         }
 
+        // Setter options
         foreach ($options as $key => $val) {
             // SET SPECIFIC SETTER THEME OPTIONS BY CONFIG
             $callSetMethod = 'set'. str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this->getOptions(), $callSetMethod)) {
+            if (method_exists($this, $callSetMethod)) {
+                $this->{$callSetMethod}($val);
+
                 unset($options[$key]);
             }
         }
@@ -156,7 +160,11 @@ class Theme implements
         $serviceManager->setAllowOverride(false);
 
         # get back options to locator
-        $serviceManager->get('yTheme\ThemeLocator')
+
+        /**
+         * @var Locator
+         */
+        $this->getParam('theme_locator')
             ->setConfig($config['yima-ytheme']);
 
         // ... }
@@ -249,6 +257,43 @@ class Theme implements
     {
         return $this->themesPath;
     }
+
+    // .................................................................................
+
+    /**
+     * Set default file suffix for Zend\View\Resolver\TemplatePathStack
+     *
+     * it's good practice when we move themes folder to www root change -
+     * suffix to .php to protect themes file.
+     *
+     * @param  string $defaultSuffix
+     *
+     * @return $this
+     */
+    public function setPathStackResolverSuffix($defaultSuffix)
+    {
+        if ($this->serviceManager->has('ViewTemplatePathStack')) {
+            /** @var $tps \Zend\View\Resolver\TemplatePathStack */
+            $tps = $this->serviceManager->get('ViewTemplatePathStack');
+
+            $tps->setDefaultSuffix($defaultSuffix);
+        }
+
+        return $this;
+    }
+
+    public function getPathStackResolverSuffix()
+    {
+        if (! $this->serviceManager->has('ViewTemplatePathStack')) {
+            return false;
+        }
+
+        /** @var $tps \Zend\View\Resolver\TemplatePathStack */
+        $tps = $this->serviceManager->get('ViewTemplatePathStack');
+
+        return $tps->getDefaultSuffix();
+    }
+
 
     /**
      * Used for passing some params variable between each action during MvcEvents.

@@ -3,10 +3,11 @@ return array(
 
     /*
      * > Themes config name key
-     *   exp.
+     *   exp. merged with [yima-ytheme] [
      *   'themes' => array(
             'builder' => array(
              ...
+         ]
      */
 
     'widgets' => array(
@@ -18,12 +19,29 @@ return array(
             ),
         ),
         */
-        'fullwidth' => array(
-            'welcome_area' => array(
+        'fullwidth' => array( // or any Itterate object with area key and widget value
+            'welcome_area' => array(                                             #  |
+                // Widgets can be string, viewModel, or __toString               <- /
                 'ThemeStartup\Widget\Tagline', // show messages and navigation according to page
             ),
         ),
     ),
+
+    /*
+     * > Setter Config keys
+     *
+     * exp. 'setter_option_method' mapped to ThemeObject::setterOptionMethod('value')
+     */
+
+    #'setter_option_method' => 'value',
+    'path_stack_resolver_suffix' => 'phtml',
+
+    /*
+     * > Stored as a config options and can get later
+     *
+     * exp. 'background' => 'wood',
+     */
+
 
     /*
      * > Theme Locator config
@@ -31,8 +49,8 @@ return array(
 
     'theme_locator' => array(
         'layout_notfound'  => '404',
-        'layout_exception' => 'fullwidth',
-        'layout_forbidden' => 'fullwidth',
+        'layout_exception' => 'error',
+        'layout_forbidden' => 'forbidden',
 
         //'layout_resolver_adapter' => '',
         // ...

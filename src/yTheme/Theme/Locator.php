@@ -42,13 +42,19 @@ class Locator implements
     {
         // by getting theme also we initialize theme
         // to theme options to work
-        $this->getTheme();
+        $theme = $this->getTheme();
+        $theme->setParam('theme_locator', $this);
+
+        if (method_exists($theme, 'initialize')) {
+            // initialize theme object
+            $theme->initialize();
+        }
     }
 
     /**
      * Find Matched Theme and return object
      *
-     * @return ThemeObject
+     * @return Theme
      */
     public function getTheme()
     {
@@ -70,11 +76,6 @@ class Locator implements
         $themeObject->setName($this->attainThemeName());
         $themeObject->setThemesPath($this->attainPathName());
 
-        if (method_exists($themeObject, 'initialize')) {
-            // initialize theme object
-            $themeObject->initialize();
-        }
-
         return $themeObject;
     }
 
@@ -83,7 +84,7 @@ class Locator implements
      *
      * @param MvcEvent $e
      *
-     * @return mixed
+     * @return string | false
      */
     public function getMvcLayout(MvcEvent $e)
     {
@@ -97,7 +98,8 @@ class Locator implements
         if (isset($config['mvclayout_resolver_adapter'])) {
             $config = $config['mvclayout_resolver_adapter'];
         } else {
-            throw new \Exception('No "mvclayout_resolver_adapter" config key found on ThemeLocator config.');
+            // use default layout name
+            return false;
         }
 
         // is string

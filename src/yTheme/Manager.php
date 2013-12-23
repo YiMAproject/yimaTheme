@@ -202,8 +202,14 @@ class Manager implements
 
         // load widgets into {
         $themeLocator = $this->getThemeLocator();
+        $themeObject  = $themeLocator->getTheme();
+
+        $sm = $this->getServiceManager();
 
         $config       = $themeLocator->getConfig();
+        $config       = $config['themes'];
+        $themeName = $themeObject->getName();
+        $config       = $config[$themeName];
         $layout       = $viewModel->getTemplate();
         $areas = isset($config['widgets'][$layout]) ? $config['widgets'][$layout] : array();
         foreach($areas as $area => $widgets)

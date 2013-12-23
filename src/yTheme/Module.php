@@ -3,8 +3,10 @@ namespace yTheme;
 
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
+use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
 
-class Module
+class Module implements
+    ViewHelperProviderInterface
 {
     /**
      * @var ModuleManagerInterface
@@ -55,6 +57,15 @@ class Module
                 'yTheme\ThemeManager' => 'yTheme\Manager',
                 'yTheme\ThemeLocator' => 'yTheme\Theme\Locator',
                 'yTheme\ThemeObject'  => 'yTheme\Theme\Theme',
+            ),
+        );
+    }
+
+    public function getViewHelperConfig()
+    {
+        return array(
+            'factories' => array(
+                'theme' => 'yTheme\View\Helper\ThemeHelperFactory',
             ),
         );
     }
