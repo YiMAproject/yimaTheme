@@ -13,7 +13,7 @@ return array(
                 'yTheme\Resolvers\Theme\Config' => -1000,
                 'yTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
             ),
-            'default_theme_name'  => 'builder', // used by yTheme\Resolvers\Theme\Config
+            'default_theme_name'  => 'syndicate', // used by yTheme\Resolvers\Theme\Config
             'themes_default_path' => (defined(APP_DIR_APPLICATION))
                     ? APP_DIR_APPLICATION .DS. 'themes' // used in Yima
                     : 'your_path_to_themes',
@@ -21,7 +21,9 @@ return array(
             // .............................................................................................
 
             'mvclayout_resolver_adapter' => array(
-                'yTheme\Resolvers\Layout\Error' => -10000, // inject exception layouts on 404,504,exception
+                // inject exception layouts on 404,504,exception
+                // we want error layouts above others
+                'yTheme\Resolvers\Layout\Error' => 10000,
             ),
             # default layouts, can override by theme specific conf.
             // used by yTheme\Resolvers\Layout\Error
@@ -34,7 +36,7 @@ return array(
         # Note: after including current detected theme specific config, -
         # config with theme name merged here ...
         'themes' => array(
-            'builder' => array(
+            'syndicate' => array(
                 # u can change this theme to another folder.(realpath returned automatically)
                 # in this folder folder with builder (name of theme) must found.
                 'dir_path' => __DIR__ .DS. '..' .DS. 'themes',

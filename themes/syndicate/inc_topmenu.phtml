@@ -1,0 +1,25 @@
+<?php
+/*
+ * Top Menu Navigation
+ *
+ * @see home.phtml, default.phtml
+ */
+?>
+<div id="intro" class="navbar"></div>
+<!--start navigation-->
+<div class="navbar navbar-fixed-top">
+    <div class="container" data-start="padding: 15px 0px;" data-200="padding: 0px 0px;">
+        <a href="<?php echo $this->url('home'); ?>" class="navbar-brand">
+            <img class="img-responsive" src="<?php echo $this->staticUri('staticuri.syndicate'); ?>/img/logo.png" alt="Yima <?php echo $this->translate('Application Framework'); ?>">
+        </a>
+        <div class="nav-collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav pull-right">
+                <li><a href="<?php echo $this->url('home'); ?>"><?php echo $this->translate('Home') ?></a></li>
+                <!--
+                <li class="active"><a href="#services">Services</a></li>
+                -->
+            </ul>
+        </div>
+    </div>
+</div>
+<!--end navigation-->

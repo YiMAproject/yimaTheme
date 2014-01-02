@@ -1,0 +1,41 @@
+<?php echo $this->doctype(); ?>
+<html lang="en">
+    <head>
+        <?php
+        // =====================------------ Attach Heads -----------==============================
+        include_once 'inc_headscripts.php';
+        ?>
+	</head>
+
+	<body>
+        <div id="preloader">
+            <div id="status">&nbsp;</div>
+        </div>
+        <?php echo $this->render('inc_topmenu');?>
+
+        <?php
+        echo $this->render(
+            'theme-features/carousel_intro',
+            array('have_more' => true, 'words' =>'with <i class="icon-heart"></i> and <i class="icon-coffee"></i> made for you')
+        );
+        ?>
+
+        <?php $this->staticUri('basePath'); //reset to basePath()?>
+        <?php echo $this->content; ?>
+
+        <?php
+        // Layout Section, widgets can place here
+        echo $this->layout()->bottomSection;
+        ?>
+
+        <?php echo $this->render('inc_footer');?>
+
+        <?php
+        // =====================------------ Attach Scripts -----------==============================
+        include_once 'inc_scripts.php';
+
+        echo $this->inlineScript();
+        echo $this->headScript();
+        ?>
+    </body>
+</html>

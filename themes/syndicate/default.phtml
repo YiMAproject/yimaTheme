@@ -1,0 +1,46 @@
+<?php echo $this->doctype(); ?>
+<html lang="en">
+    <head>
+        <?php
+        // =====================------------ Attach Heads -----------==============================
+        include_once 'inc_headscripts.php';
+        ?>
+    </head>
+
+	<body>
+        <div id="preloader">
+            <div id="status">&nbsp;</div>
+        </div>
+        <?php echo $this->render('inc_topmenu');?>
+
+        <?php
+        // Layout Section, widgets can place here
+        echo $this->layout()->topSection;
+        ?>
+
+        <section>
+            <div class="container">
+                <div class="row margin">
+                <?php $this->staticUri('basePath'); //reset to basePath()?>
+                <?php echo $this->content; ?>
+                </div>
+            </div>
+        </section>
+
+
+        <?php
+        // Layout Section, widgets can place here
+        echo $this->layout()->bottomSection;
+        ?>
+
+        <?php echo $this->render('inc_footer');?>
+
+        <?php
+        // =====================------------ Attach Scripts -----------==============================
+        include_once 'inc_scripts.php';
+
+        echo $this->inlineScript();
+        echo $this->headScript();
+        ?>
+	</body>
+</html>
