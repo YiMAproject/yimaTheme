@@ -37,6 +37,11 @@ What this module provides?
 #### Design With Widgets Support In Mind
  we can inject some widget(widgets are viewModel, string or toString object) for each layout
 
+Instruction
+-----------
+
+*step into codes, explore default theme syndicate and see comments*
+
 Installation 
 -----------
 
