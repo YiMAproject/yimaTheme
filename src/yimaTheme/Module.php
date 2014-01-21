@@ -1,5 +1,5 @@
 <?php
-namespace yTheme;
+namespace yimaTheme;
 
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
@@ -34,10 +34,10 @@ class Module implements
     {
         $sl = $e->getApplication()->getServiceManager();
 
-        $themManager = $sl->get('ytheme\ThemeManager');
+        $themManager = $sl->get('yimatheme\ThemeManager');
         if (!$themManager instanceof ManagerInterface) {
             throw new \Exception(
-                sprintf('yTheme theme manager most instance of "ManagerInterface" but "%s" given.', get_class($themManager))
+                sprintf('yimaTheme theme manager most instance of "ManagerInterface" but "%s" given.', get_class($themManager))
             );
         }
 
@@ -54,9 +54,9 @@ class Module implements
     {
         return array (
             'invokables' => array (
-                'yTheme\ThemeManager' => 'yTheme\Manager',
-                'yTheme\ThemeLocator' => 'yTheme\Theme\Locator',
-                'yTheme\ThemeObject'  => 'yTheme\Theme\Theme',
+                'yimaTheme\ThemeManager' => 'yimaTheme\Manager',
+                'yimaTheme\ThemeLocator' => 'yimaTheme\Theme\Locator',
+                'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
             ),
         );
     }
@@ -65,7 +65,7 @@ class Module implements
     {
         return array(
             'factories' => array(
-                'theme' => 'yTheme\View\Helper\ThemeHelperFactory',
+                'theme' => 'yimaTheme\View\Helper\ThemeHelperFactory',
             ),
         );
     }

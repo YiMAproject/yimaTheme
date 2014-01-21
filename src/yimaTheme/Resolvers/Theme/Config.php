@@ -1,8 +1,8 @@
 <?php
-namespace yTheme\Resolvers\Theme;
+namespace yimaTheme\Resolvers\Theme;
 
-use yTheme\Resolvers\ConfigResolverAwareInterface;
-use yTheme\Resolvers\ResolverInterface;
+use yimaTheme\Resolvers\ConfigResolverAwareInterface;
+use yimaTheme\Resolvers\ResolverInterface;
 
 class Config implements
     ResolverInterface,
@@ -29,7 +29,7 @@ class Config implements
     }
 
     /**
-     * Set yTheme merged config
+     * Set yimaTheme merged config
      *
      * @param Array $config
      */

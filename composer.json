@@ -1,12 +1,14 @@
 {
-    "name": "rayamedia/yima-ytheme",
+    "name": "rayamedia/yima-theme",
     "type": "yima-core-module",
-    "description": "Professional template system, Simple, Maintainable, Extendable.",
+    "description": "Professional UI layout system, Simple Powerfull, Maintainable, Extendable.",
     "keywords": [
         "theme",
         "template",
+        "layout",
         "ui",
         "zf2 module",
+        "zf2",
         "yima",
         "raya media"
     ],
@@ -21,11 +23,11 @@
         "rayamedia/yima-plugin-installer": "dev-master"
     },
     "extra": {
-        "yima-plugin-name": "yTheme"
+        "yima-plugin-name": "yimaTheme"
     },
     "autoload" : {
         "psr-0" : {
-            "yTheme\\" : "src/"
+            "yimaTheme\\" : "src/"
         },
         "classmap" : [
             "./Module.php"

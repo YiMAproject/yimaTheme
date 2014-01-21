@@ -1,5 +1,5 @@
 <?php
-namespace yTheme;
+namespace yimaTheme;
 
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -11,8 +11,8 @@ use Zend\View\Resolver as ViewResolver;
 
 use Zend\EventManager\SharedEventManager;
 
-use yTheme\Theme\LocatorInterface;
-use yTheme\Theme\LocatorDefaultInterface;
+use yimaTheme\Theme\LocatorInterface;
+use yimaTheme\Theme\LocatorDefaultInterface;
 
 use Zend\Stdlib\ResponseInterface as Response;
 use Zend\View\Model\ModelInterface as ViewModel;
@@ -116,18 +116,18 @@ class Manager implements
      */
     protected function getDefaultThemeLocator()
     {
-        /** @var $defaultThemeLocator \yTheme\Theme\Locator */
-        $defaultThemeLocator = $this->getServiceManager()->get('yTheme\ThemeLocator');
+        /** @var $defaultThemeLocator \yimaTheme\Theme\Locator */
+        $defaultThemeLocator = $this->getServiceManager()->get('yimaTheme\ThemeLocator');
         if (!$defaultThemeLocator instanceof LocatorDefaultInterface) {
             throw new \Exception(
-                'Default Theme Locator Service (yTheme\ThemeLocator) must instance of yTheme\Theme\LocatorDefaultInterface'
+                'Default Theme Locator Service (yimaTheme\ThemeLocator) must instance of yimaTheme\Theme\LocatorDefaultInterface'
             );
         }
 
         // get default manager config used by default theme locator
         $config = $this->getServiceManager()->get('config');
-        if (isset($config['yima-ytheme']) && is_array($config['yima-ytheme'])) {
-            $config = $config['yima-ytheme'];
+        if (isset($config['yima-theme']) && is_array($config['yima-theme'])) {
+            $config = $config['yima-theme'];
         } else {
             $config = array();
         }
@@ -269,7 +269,7 @@ class Manager implements
 
         $viewTemplatePathStack   = $this->getServiceManager()->get('ViewTemplatePathStack');
         if (! $viewTemplatePathStack instanceof ViewResolver\TemplatePathStack) {
-            throw new \Exception('yTheme work with PathStack');
+            throw new \Exception('yimaTheme work with PathStack');
         }
 
         return $return;

@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\Theme;
+namespace yimaTheme\Theme;
 
 interface ThemeInterface extends ThemeDefaultInterface
 {

@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\View\Helper;
+namespace yimaTheme\View\Helper;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -10,7 +10,7 @@ class ThemeHelperFactory implements FactoryInterface
     {
         $serviceManager = $serviceLocator->getServiceLocator();
 
-        $themeLocator   = $serviceManager->get('yTheme\Theme\Locator');
+        $themeLocator   = $serviceManager->get('yimaTheme\Theme\Locator');
         $themeHelper    = new ThemeHelper($themeLocator);
 
         return $themeHelper;

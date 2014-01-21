@@ -1,12 +1,12 @@
 <?php
-namespace yTheme\Theme;
+namespace yimaTheme\Theme;
 
-use yTheme\Resolvers\ConfigResolverAwareInterface;
-use yTheme\Resolvers\LocatorResolverAwareInterface;
-use yTheme\Resolvers\MvcResolverAwareInterface;
+use yimaTheme\Resolvers\ConfigResolverAwareInterface;
+use yimaTheme\Resolvers\LocatorResolverAwareInterface;
+use yimaTheme\Resolvers\MvcResolverAwareInterface;
 use Zend\Mvc\MvcEvent;
 
-use yTheme\Resolvers\Aggregate;
+use yimaTheme\Resolvers\Aggregate;
 
 use Zend\ServiceManager;
 
@@ -63,11 +63,11 @@ class Locator implements
         }
 
         $themeObject = $this->getServiceLocator()
-            ->get('yTheme\ThemeObject');
+            ->get('yimaTheme\ThemeObject');
         if (! $themeObject instanceof Theme) {
             throw new \Exception(
                 sprintf(
-                    'yTheme\ThemeObject must instanceof "\yTheme\Theme\Them" but "%s" given.',
+                    'yimaTheme\ThemeObject must instanceof "\yimaTheme\Theme\Them" but "%s" given.',
                     get_class($themeObject)
                 )
             );
@@ -115,7 +115,7 @@ class Locator implements
                 $service = $this->getServiceLocator()->get($service);
             } else {
                 if (!class_exists($service)) {
-                    throw new \Exception("Layout Resolver '$service' not found for yTheme.");
+                    throw new \Exception("Layout Resolver '$service' not found for yimaTheme.");
                 }
 
                 $service = new $service();
@@ -127,7 +127,7 @@ class Locator implements
             }
 
             if ($service instanceof ConfigResolverAwareInterface) {
-                // set yTheme config for resolver
+                // set yimaTheme config for resolver
                 $service->setConfig($this->getConfig());
             }
 
@@ -183,7 +183,7 @@ class Locator implements
                 $service = $this->getServiceLocator()->get($service);
             } else {
                 if (!class_exists($service)) {
-                    throw new \Exception("Resolver '$service' not found for yTheme.");
+                    throw new \Exception("Resolver '$service' not found for yimaTheme.");
                 }
 
                 $service = new $service();
@@ -195,7 +195,7 @@ class Locator implements
             }
 
             if ($service instanceof ConfigResolverAwareInterface) {
-                // set yTheme config for resolver
+                // set yimaTheme config for resolver
                 $service->setConfig($this->getConfig());
             }
 

@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\Theme;
+namespace yimaTheme\Theme;
 
 interface LocatorDefaultInterface extends LocatorInterface
 {

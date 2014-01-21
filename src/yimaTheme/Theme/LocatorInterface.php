@@ -1,7 +1,7 @@
 <?php
-namespace yTheme\Theme;
+namespace yimaTheme\Theme;
 
-use yTheme\Theme\Theme as ThemeObject;
+use yimaTheme\Theme\Theme as ThemeObject;
 use Zend\Mvc\MvcEvent;
 
 interface LocatorInterface

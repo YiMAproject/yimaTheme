@@ -3,7 +3,7 @@ return array(
 
     /*
      * > Themes config name key
-     *   exp. merged with [yima-ytheme] [
+     *   exp. merged with [yima-theme] [
      *   'themes' => array(
             'builder' => array(
              ...

@@ -1,8 +1,8 @@
 <?php
-namespace yTheme\View\Helper;
+namespace yimaTheme\View\Helper;
 
-use yTheme\Theme\LocatorDefaultInterface;
-use yTheme\Theme\ThemeDefaultInterface;
+use yimaTheme\Theme\LocatorDefaultInterface;
+use yimaTheme\Theme\ThemeDefaultInterface;
 use Zend\View\Helper\AbstractHelper;
 
 class ThemeHelper extends AbstractHelper
@@ -37,7 +37,7 @@ class ThemeHelper extends AbstractHelper
     /**
      * Get Instance To Theme Object
      *
-     * @return \yTheme\Theme\Theme|ThemeDefaultInterface
+     * @return \yimaTheme\Theme\Theme|ThemeDefaultInterface
      */
     public function getThemeInstance()
     {

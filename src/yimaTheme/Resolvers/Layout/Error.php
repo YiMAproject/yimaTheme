@@ -1,9 +1,9 @@
 <?php
-namespace yTheme\Resolvers\Layout;
+namespace yimaTheme\Resolvers\Layout;
 
-use yTheme\Resolvers\ResolverInterface;
-use yTheme\Resolvers\MvcResolverAwareInterface;
-use yTheme\Resolvers\ConfigResolverAwareInterface;
+use yimaTheme\Resolvers\ResolverInterface;
+use yimaTheme\Resolvers\MvcResolverAwareInterface;
+use yimaTheme\Resolvers\ConfigResolverAwareInterface;
 
 use Zend\View\Model\ModelInterface as ViewModel;
 
@@ -95,7 +95,7 @@ class Error implements
     }
 
     /**
-     * Set yTheme merged config
+     * Set yimaTheme merged config
      *
      * @param Array $config
      */

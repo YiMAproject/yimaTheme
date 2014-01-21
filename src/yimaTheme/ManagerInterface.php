@@ -1,5 +1,5 @@
 <?php
-namespace yTheme;
+namespace yimaTheme;
 
 use Zend\Mvc\MvcEvent;
 

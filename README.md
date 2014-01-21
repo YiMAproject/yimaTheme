@@ -11,7 +11,7 @@ What this module provides?
 
 #### Put Themes Anywhere
  here we can have multiple templates that each one stored to different or same folder as default themes folder.
- this can help that each modules required yTheme can have own template inside module package. (useful for modules like administration backend)
+ this can help that each modules required yimaTheme can have own template inside module package. (useful for modules like administration backend)
 
 #### Resolvers
  we have resolvers for themes and layout.
@@ -47,10 +47,10 @@ Installation
 
 Composer installation:
 
-require ```rayamedia/yima-ytheme``` in your ```composer.json```
+require ```rayamedia/yima-theme``` in your ```composer.json```
 
 Or clone to modules folder
 
-Enable module with name ```yTheme```
+Enable module with name ```yimaTheme```
 
-Note: see yTheme\themes\syndicate\www\README.md
+Note: see yimaTheme\themes\syndicate\www\README.md

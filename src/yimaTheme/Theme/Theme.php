@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\Theme;
+namespace yimaTheme\Theme;
 
 use Zend\ServiceManager\Config;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -114,7 +114,7 @@ class Theme implements
             $systemConfigs = ArrayUtils::merge(
                 $systemConfigs,
                 array(
-                    'yima-ytheme' => array(
+                    'yima-theme' => array(
                         'theme_locator' => $options['theme_locator']
                     )
                 )
@@ -139,7 +139,7 @@ class Theme implements
         $systemConfigs = ArrayUtils::merge(
             $systemConfigs,
             array(
-                'yima-ytheme' => array(
+                'yima-theme' => array(
                     'themes' => array(
                         $themeName => $options
                     )
@@ -165,7 +165,7 @@ class Theme implements
          * @var Locator
          */
         $this->getParam('theme_locator')
-            ->setConfig($config['yima-ytheme']);
+            ->setConfig($config['yima-theme']);
 
         // ... }
 

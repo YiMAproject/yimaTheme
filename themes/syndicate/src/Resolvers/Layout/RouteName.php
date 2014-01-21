@@ -1,9 +1,9 @@
 <?php
 namespace themeSyndicate\Resolvers\Layout;
 
-use yTheme\Resolvers\ResolverInterface;
-use yTheme\Resolvers\MvcResolverAwareInterface;
-use yTheme\Resolvers\ConfigResolverAwareInterface;
+use yimaTheme\Resolvers\ResolverInterface;
+use yimaTheme\Resolvers\MvcResolverAwareInterface;
+use yimaTheme\Resolvers\ConfigResolverAwareInterface;
 
 use Zend\Mvc\Router\RouteMatch;
 use Zend\Mvc\MvcEvent;
@@ -52,7 +52,7 @@ class RouteName implements
     }
 
     /**
-     * Set yTheme merged config
+     * Set yimaTheme merged config
      *
      * @param Array $config
      */

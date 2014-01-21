@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\Resolvers;
+namespace yimaTheme\Resolvers;
 
 use Countable;
 use IteratorAggregate;

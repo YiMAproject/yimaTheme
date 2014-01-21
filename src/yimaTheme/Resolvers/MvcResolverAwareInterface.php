@@ -1,5 +1,5 @@
 <?php
-namespace yTheme\Resolvers;
+namespace yimaTheme\Resolvers;
 
 use Zend\Mvc\MvcEvent;
 

@@ -1,7 +1,7 @@
 <?php
-namespace yTheme\Resolvers\Theme;
+namespace yimaTheme\Resolvers\Theme;
 
-use yTheme\Resolvers\ResolverInterface;
+use yimaTheme\Resolvers\ResolverInterface;
 
 class Sentenced implements
     ResolverInterface

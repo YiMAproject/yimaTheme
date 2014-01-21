@@ -1,13 +1,13 @@
 <?php
-namespace yTheme\Resolvers;
-use yTheme\Theme\LocatorDefaultInterface;
+namespace yimaTheme\Resolvers;
+use yimaTheme\Theme\LocatorDefaultInterface;
 
 /**
  * Resolver classes that implement this can have themeLocator injected into
  *
  * Interface MvcResolverAwareInterface
  *
- * @package yTheme\Resolvers
+ * @package yimaTheme\Resolvers
  */
 interface LocatorResolverAwareInterface
 {
