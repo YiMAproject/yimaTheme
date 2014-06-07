@@ -14,7 +14,7 @@ return array(
                 'yimaTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
             ),
             'default_theme_name'  => 'syndicate', // used by yimaTheme\Resolvers\Theme\Config
-            'themes_default_path' => (defined(APP_DIR_APPLICATION))
+            'themes_default_path' => (defined('APP_DIR_APPLICATION'))
                     ? APP_DIR_APPLICATION .DS. 'themes' // used in Yima
                     : 'your_path_to_themes',
 
