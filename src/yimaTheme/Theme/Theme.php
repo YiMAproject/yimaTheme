@@ -79,7 +79,7 @@ class Theme implements
         $systemConfigs = (isset($options['application'])) ? $options['application'] : array();
 
         // autoloader initial {
-        if (is_array($systemConfigs['autoloader'])) {
+        if (isset($systemConfigs['autoloader']) && is_array($systemConfigs['autoloader'])) {
             \Zend\Loader\AutoloaderFactory::factory($systemConfigs['autoloader']);
         }
         unset($systemConfigs['autoloader']);
