@@ -244,7 +244,7 @@ class Theme implements
     {
         if (!is_dir($path)) {
             throw new \Exception(
-                sprintf('Path "$path" not found')
+                sprintf('Path "%s" not found.', $path)
             );
         }
 
