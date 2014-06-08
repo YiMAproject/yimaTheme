@@ -27,9 +27,9 @@ return array(
             ),
             # default layouts, can override by theme specific conf.
             // used by yimaTheme\Resolvers\Layout\Error
-            'layout_notfound'  => '404',
-            'layout_exception' => 'error',
-            'layout_forbidden' => 'forbidden',
+            'layout_notfound'  => 'spec/404',
+            'layout_exception' => 'spec/error',
+            'layout_forbidden' => 'spec/forbidden',
         ),
 
         // tanzimat e makhsoos be har template dar injaa gharaar migirad
