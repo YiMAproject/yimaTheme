@@ -1,25 +1,49 @@
 <?php
 namespace yimaTheme;
 
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
 
+/**
+ * Class Module
+ * @package yimaTheme
+ */
 class Module implements
-    ViewHelperProviderInterface
+    InitProviderInterface,
+    ServiceProviderInterface,
+    ViewHelperProviderInterface,
+    ConfigProviderInterface,
+    AutoloaderProviderInterface
 {
     /**
      * @var ModuleManagerInterface
      */
     protected $manager;
 
+    /**
+     * Initialize workflow
+     *
+     * @param  ModuleManagerInterface $manager
+     * @return void
+     */
     public function init(ModuleManagerInterface $moduleManager)
     {
-        //Theme Manager run before all on application bootstrap
         $events = $moduleManager->getEventManager()->getSharedManager();
         $events->attach(
-            'Zend\Mvc\Application',
-            MvcEvent::EVENT_BOOTSTRAP,
+            'Zend\Mvc\Controller\AbstractController',
+            MvcEvent::EVENT_DISPATCH,
+            array($this,'initThemeManager'),
+            100000
+        );
+
+        $events->attach(
+            'Zend\Mvc\Controller\AbstractController',
+            MvcEvent::EVENT_DISPATCH_ERROR,
             array($this,'initThemeManager'),
             100000
         );
@@ -45,10 +69,10 @@ class Module implements
     }
 
     /**
-     * Register service on LOAD_MODULES_POST,
-     * in service tavasote Manager dar event e BOOTSTRAP baraaie amaliaat dar dastres ast
+     * Expected to return \Zend\ServiceManager\Config object or array to
+     * seed such an object.
      *
-     * @return array
+     * @return array|\Zend\ServiceManager\Config
      */
     public function getServiceConfig()
     {
@@ -61,6 +85,12 @@ class Module implements
         );
     }
 
+    /**
+     * Expected to return \Zend\ServiceManager\Config object or array to
+     * seed such an object.
+     *
+     * @return array|\Zend\ServiceManager\Config
+     */
     public function getViewHelperConfig()
     {
         return array(
@@ -70,11 +100,21 @@ class Module implements
         );
     }
 
+    /**
+     * Returns configuration to merge with application configuration
+     *
+     * @return array|\Traversable
+     */
     public function getConfig()
     {
         return include __DIR__ . '/../../config/module.config.php';
     }
 
+    /**
+     * Return an array for passing to Zend\Loader\AutoloaderFactory.
+     *
+     * @return array
+     */
     public function getAutoloaderConfig()
     {
         return array(

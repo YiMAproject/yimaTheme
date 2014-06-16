@@ -41,7 +41,7 @@ class Aggregate implements
 
 		foreach ($this->queue as $detector) {
 			$name = $detector->getName();
-			if (! $name ) {
+			if (empty($name) && $name !== '0') {
 				// No resource found; try next resolver
 				continue;
 			}
