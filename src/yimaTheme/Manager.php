@@ -209,7 +209,7 @@ class Manager implements
         $config       = $themeLocator->getConfig();
         $config       = $config['themes'];
         $themeName = $themeObject->getName();
-        $config       = $config[$themeName];
+        $config       = (isset($config[$themeName])) ? $config[$themeName] : array();
         $layout       = $viewModel->getTemplate();
         $areas = isset($config['widgets'][$layout]) ? $config['widgets'][$layout] : array();
         foreach($areas as $area => $widgets)
