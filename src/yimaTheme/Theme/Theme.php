@@ -1,13 +1,13 @@
 <?php
 namespace yimaTheme\Theme;
 
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\Config;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
-use Zend\Stdlib\ArrayUtils;
 
+/**
+ * Class Theme
+ * @package yimaTheme\Theme
+ */
 class Theme implements
     ThemeInterface,
     ServiceManagerAwareInterface
