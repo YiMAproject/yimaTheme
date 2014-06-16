@@ -6,7 +6,7 @@ use Zend\Mvc\MvcEvent;
  */
 
 /** @var $sm \Zend\ServiceManager\ServiceManager */
-$sm = $this->serviceManager;
+$sm = $this->getServiceManager();
 
 // -- Register some autoload ------------------------------------------------
 \Zend\Loader\AutoloaderFactory::factory(array());

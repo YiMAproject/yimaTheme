@@ -251,4 +251,14 @@ class Theme implements
     {
         $this->serviceManager = $serviceManager;
     }
+
+    /**
+     * Get service manager
+     *
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
 }
