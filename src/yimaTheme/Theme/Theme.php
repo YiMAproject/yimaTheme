@@ -1,6 +1,7 @@
 <?php
 namespace yimaTheme\Theme;
 
+use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\Config;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -72,102 +73,11 @@ class Theme implements
             return $this;
         }
 
-        $options = $this->getOptions();
-
-        // ===============================================================================================
-
-        $systemConfigs = (isset($options['application'])) ? $options['application'] : array();
-
-        // autoloader initial {
-        if (isset($systemConfigs['autoloader']) && is_array($systemConfigs['autoloader'])) {
-            \Zend\Loader\AutoloaderFactory::factory($systemConfigs['autoloader']);
+        $themePathname = $this->getThemesPath().DS.$this->getName();
+        $configFile = $themePathname.DS.'theme.bootstrap.php';
+        if (file_exists($configFile)) {
+            include $configFile;
         }
-        unset($systemConfigs['autoloader']);
-        // ... }
-
-        // configure services registered in serviceManager {
-        foreach ($systemConfigs as $key => $val) {
-            if ($this->serviceManager->has($key)) {
-                // theme config key is a registered service
-                $service = $this->serviceManager->get($key);
-                if ($service instanceof ServiceLocatorInterface) {
-                    $serviceConfig = new Config($val);
-                    $serviceConfig->configureServiceManager($service);
-
-                    unset($systemConfigs[$key]);
-                }
-            }
-        }
-        // ... }
-        #  all config left behind merge with modules merged config
-        // this not sounds good {
-        if (isset($options['application'])) {
-            // application configuration done, unset application
-            unset($options['application']);
-        }
-        // ... }
-
-        // =========================================================================================
-
-        if (isset($options['theme_locator'])) {
-            // merge theme_locator to merged config
-            $systemConfigs = ArrayUtils::merge(
-                $systemConfigs,
-                array(
-                    'yima-theme' => array(
-                        'theme_locator' => $options['theme_locator']
-                    )
-                )
-            );
-
-            unset($options['theme_locator']);
-        }
-
-        // Setter options
-        foreach ($options as $key => $val) {
-            // SET SPECIFIC SETTER THEME OPTIONS BY CONFIG
-            $callSetMethod = 'set'. str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-            if (method_exists($this, $callSetMethod)) {
-                $this->{$callSetMethod}($val);
-
-                unset($options[$key]);
-            }
-        }
-
-        #  all config left behind merge with modules merged config
-        $themeName = $this->getName();
-        $systemConfigs = ArrayUtils::merge(
-            $systemConfigs,
-            array(
-                'yima-theme' => array(
-                    'themes' => array(
-                        $themeName => $options
-                    )
-                )
-            )
-        );
-
-        // ----------------------------------------------------------------------------------------
-
-        // merge theme options to application merged config {
-        $serviceManager = $this->serviceManager;
-
-        $mergedConf     = $serviceManager->get('Config');
-        $config         = ArrayUtils::merge($mergedConf, $systemConfigs);
-
-        $serviceManager->setAllowOverride(true);
-        $serviceManager->setService('config',$config);
-        $serviceManager->setAllowOverride(false);
-
-        # get back options to locator
-
-        /**
-         * @var Locator
-         */
-        $this->getParam('theme_locator')
-            ->setConfig($config['yima-theme']);
-
-        // ... }
 
         $this->initialized = true;
 
@@ -176,8 +86,8 @@ class Theme implements
 
     /**
      * Mostaghiman file e marboot be option haaie theme raa mikhaanad
-     *
      * @return array
+     * @deprecated
      */
     protected function getOptions()
     {
@@ -258,7 +168,26 @@ class Theme implements
         return $this->themesPath;
     }
 
-    // .................................................................................
+    // Setter Methods -----------------------------------------------------------------
+
+    /**
+     * Set view inline scripts
+     *
+     * @param $scripts
+     */
+    public function setInlineScripts(array $scripts)
+    {
+        $sm = $this->serviceManager;
+        $vr = $sm->get('viewrenderer');
+        foreach ($scripts as $sc) {
+
+            $vr->inlineScript()->appendScript(
+                 $sc
+            );
+        }
+
+        return $this;
+    }
 
     /**
      * Set default file suffix for Zend\View\Resolver\TemplatePathStack
@@ -282,17 +211,7 @@ class Theme implements
         return $this;
     }
 
-    public function getPathStackResolverSuffix()
-    {
-        if (! $this->serviceManager->has('ViewTemplatePathStack')) {
-            return false;
-        }
-
-        /** @var $tps \Zend\View\Resolver\TemplatePathStack */
-        $tps = $this->serviceManager->get('ViewTemplatePathStack');
-
-        return $tps->getDefaultSuffix();
-    }
+    # -----------------------------------------------------------------------------------
 
 
     /**
@@ -321,6 +240,7 @@ class Theme implements
 
         return (isset($this->params[$name])) ? $this->params[$name] : false;
     }
+
 
     /**
      * Set service manager
