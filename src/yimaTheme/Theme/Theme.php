@@ -168,52 +168,6 @@ class Theme implements
         return $this->themesPath;
     }
 
-    // Setter Methods -----------------------------------------------------------------
-
-    /**
-     * Set view inline scripts
-     *
-     * @param $scripts
-     */
-    public function setInlineScripts(array $scripts)
-    {
-        $sm = $this->serviceManager;
-        $vr = $sm->get('viewrenderer');
-        foreach ($scripts as $sc) {
-
-            $vr->inlineScript()->appendScript(
-                 $sc
-            );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set default file suffix for Zend\View\Resolver\TemplatePathStack
-     *
-     * it's good practice when we move themes folder to www root change -
-     * suffix to .php to protect themes file.
-     *
-     * @param  string $defaultSuffix
-     *
-     * @return $this
-     */
-    public function setPathStackResolverSuffix($defaultSuffix)
-    {
-        if ($this->serviceManager->has('ViewTemplatePathStack')) {
-            /** @var $tps \Zend\View\Resolver\TemplatePathStack */
-            $tps = $this->serviceManager->get('ViewTemplatePathStack');
-
-            $tps->setDefaultSuffix($defaultSuffix);
-        }
-
-        return $this;
-    }
-
-    # -----------------------------------------------------------------------------------
-
-
     /**
      * Used for passing some params variable between each action during MvcEvents.
      *
