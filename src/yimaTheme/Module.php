@@ -36,14 +36,7 @@ class Module implements
         $events = $moduleManager->getEventManager()->getSharedManager();
         $events->attach(
             'Zend\Mvc\Application',
-            MvcEvent::EVENT_DISPATCH,
-            array($this,'initThemeManager'),
-            100000
-        );
-
-        $events->attach(
-            'Zend\Mvc\Application',
-            MvcEvent::EVENT_DISPATCH_ERROR,
+            MvcEvent::EVENT_ROUTE,
             array($this,'initThemeManager'),
             100000
         );

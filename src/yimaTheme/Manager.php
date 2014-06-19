@@ -73,14 +73,13 @@ class Manager implements
         $events = $this->getEventManager()->getSharedManager();
 
         // we need pathstack initialized before injecting spec layouts
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'addThemePathstack'),-95);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
 
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_RENDER, array($this,'widgetizeIt'),-1000);
-
     }
 
     /**
