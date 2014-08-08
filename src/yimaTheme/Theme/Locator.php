@@ -48,24 +48,17 @@ class Locator implements
     protected $serviceManager;
 
     /**
-     * Initialize Theme Locator
-     * : invoked from themeManager::init
+     * On Bootstrap MVC Event
+     * : registered by DefaultListenerAggregates
      *
-     * @return $this
+     * @param MvcEvent $e MvcEvent
+     *
      */
-    public function init()
+    public function onMvcBootstrap(MvcEvent $e)
     {
         // by getting theme also we initialize theme
         // to theme options to work
-        $theme = $this->getTheme();
-        $theme->setParam('theme_locator', $this);
-
-        if (method_exists($theme, 'initialize')) {
-            // initialize theme object
-            $theme->initialize();
-        }
-
-        return $this;
+        $this->getPreparedThemeObject();
     }
 
     /**
@@ -73,25 +66,39 @@ class Locator implements
      *
      * @return Theme
      */
-    public function getTheme()
+    public function getPreparedThemeObject()
     {
-        if (isset($this->themeObject)) {
-            return $this->themeObject;
+        $themeObject = $this->getThemeObject();
+
+        $name = $this->attainThemeName();
+        if ($name) {
+            $themeObject->setName($name);
+            $themeObject->setThemesPath($this->attainPathName());
+
+            $themeObject->init();
         }
 
+        return $themeObject;
+    }
+
+    /**
+     * Get ThemeObject
+     *
+     * @return Theme
+     * @throws \Exception
+     */
+    protected function getThemeObject()
+    {
         $themeObject = $this->getServiceLocator()
             ->get('yimaTheme\ThemeObject');
-        if (! $themeObject instanceof Theme) {
+        if (! $themeObject instanceof ThemeDefaultInterface) {
             throw new \Exception(
                 sprintf(
-                    'yimaTheme\ThemeObject must instanceof "\yimaTheme\Theme\Them" but "%s" given.',
+                    'yimaTheme\ThemeObject must instanceof "\yimaTheme\Theme\ThemDefaultInterface" but "%s" given.',
                     get_class($themeObject)
                 )
             );
         }
-
-        $themeObject->setName($this->attainThemeName());
-        $themeObject->setThemesPath($this->attainPathName());
 
         return $themeObject;
     }
@@ -259,7 +266,7 @@ class Locator implements
      *
      * @return array
      */
-    public function getConfig()
+    protected function getConfig()
     {
         // get default manager config used by default theme locator
         $config = $this->getServiceLocator()->get('config');
@@ -271,6 +278,8 @@ class Locator implements
 
         return $config;
     }
+
+    // -- implement methods ----------------------------------------------------------------------------------------------------------
 
     /**
      * Set service locator
@@ -291,28 +300,5 @@ class Locator implements
     {
         return $this->serviceManager;
     }
-
-    /**
-     * Inject ThemeManager
-     *
-     * @param ManagerInterface $manager ThemeManager Object Instance
-     *
-     * @return mixed
-     */
-    public function setManager(ManagerInterface $manager)
-    {
-        $this->themeManager = $manager;
-
-        return $this;
-    }
-
-    /**
-     * Get Injected Theme Manager
-     *
-     * @return ManagerInterface
-     */
-    public function getManager()
-    {
-        return $this->themeManager;
-    }
 }
+

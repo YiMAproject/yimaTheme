@@ -1,23 +1,21 @@
 <?php
 namespace yimaTheme\Theme;
 
-interface ThemeInterface extends ThemeDefaultInterface
+interface ThemeInterface
 {
     /**
-     * Set render layout name
+     * Get name of theme
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Get render layout name
      *
      * @param $name
      *
-     * @return mixed
+     * @return string
      */
-    public function setLayout($name);
-
-    /**
-     * Set dir to folder that store themes
-     *
-     * @param string $path dir path
-     *
-     * @return mixed
-     */
-    public function setThemesPath($path);
+    public function getLayout();
 }

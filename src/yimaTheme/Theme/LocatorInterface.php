@@ -2,8 +2,12 @@
 namespace yimaTheme\Theme;
 
 use yimaTheme\Theme\Theme as ThemeObject;
-use Zend\Mvc\MvcEvent;
 
+/**
+ * Interface LocatorInterface
+ *
+ * @package yimaTheme\Theme
+ */
 interface LocatorInterface
 {
     /**
@@ -11,14 +15,5 @@ interface LocatorInterface
      *
      * @return ThemeObject
      */
-    public function getTheme();
-
-    /**
-     * Get layout name according to MvcEvent on EVENT_DISPATCH
-     *
-     * @param MvcEvent $e
-     *
-     * @return mixed
-     */
-    public function getMvcLayout(MvcEvent $e);
+    public function getPreparedThemeObject();
 }

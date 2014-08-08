@@ -1,11 +1,18 @@
 <?php
 namespace yimaTheme\Manager;
 
+use yimaTheme\Theme\Locator;
+use yimaTheme\Theme\LocatorDefaultInterface;
+use yimaTheme\Theme\LocatorInterface;
+use yimaTheme\Theme\ThemeDefaultInterface;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
+use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\View\Model\ViewModel;
+use Zend\View\Resolver as ViewResolver;
 
 /**
  * Class DefaultListenerAggregate
@@ -22,6 +29,11 @@ class DefaultListenerAggregate implements
     protected $sm;
 
     /**
+     * @var Locator
+     */
+    protected $themeLocator;
+
+    /**
      * Attach one or more listeners
      *
      * Implementors may add an optional $priority argument; the SharedEventManager
@@ -31,25 +43,26 @@ class DefaultListenerAggregate implements
      */
     public function attachShared(SharedEventManagerInterface $events)
     {
-        // we need pathstack initialized before injecting spec layouts
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this,'onMvcBootstrap'), 100000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this->getThemeLocator(), 'onMvcBootstrap'), 100000);
 
-//        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'addThemePathstack'),-95);
-//        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
-//
-//        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
-//        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
-//
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'addThemePathstack'),-95);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
+
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
+
 //        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_RENDER, array($this,'widgetizeIt'),-1000);
     }
 
-    public function onMvcBootstrap(MvcEvent $e)
-    {
-        /*// initialize themeLocator
-        if (method_exists($this->getThemeLocator(), 'init')) {
-            $this->getThemeLocator()->init();
-        }*/
-    }
+    // --- Events Methods ---------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * MVC Event Listener
+     *
+     * @param MvcEvent $e
+     */
+    public function onMvcBootstrap(MvcEvent $e) { }
 
     /**
      * Add Requested template path to Stack of ViewTemplatePathStack
@@ -61,7 +74,12 @@ class DefaultListenerAggregate implements
     {
         $this->checkMVC(); // test application startup config to match our need
 
-        $theme = $this->getThemeLocator()->getTheme();
+        /** @var $theme ThemeDefaultInterface */
+        $theme = $this->getThemeLocator()->getPreparedThemeObject();
+        if (! $theme->isInitialized()) {
+            // we are not attained theme name
+            return;
+        }
 
         $path = $theme->getThemesPath();
         $path = $path .DS. $theme->getName();
@@ -83,16 +101,24 @@ class DefaultListenerAggregate implements
             return;
         }
 
+        $themeLocator  = $this->getThemeLocator();
+        $preparedTheme = $themeLocator->getPreparedThemeObject();
+        if (!$preparedTheme->isInitialized()) {
+            // we are not attained theme name
+            return;
+        }
+
         // we want theme pathstack registered before
         $this->addThemePathstack($e);
 
         // get Layout from Locator
-        $layout = $this->getThemeLocator()->getMvcLayout($e);
-        if ($layout != $this->getThemeLocator()->getTheme()->getLayout()) {
-            // we wan't same on theme layout name if not set
-            $this->getThemeLocator()->getTheme()->setLayout($layout);
+        $mvcLayout = $themeLocator->getMvcLayout($e);
+        if ($mvcLayout) {
+            // we want same on theme layout name if not set
+            $preparedTheme->setLayout($mvcLayout);
         }
 
+        $layout = $preparedTheme->getLayout();
         if ($layout) {
             $model = $e->getViewModel();
             $model->setTemplate($layout);
@@ -114,7 +140,7 @@ class DefaultListenerAggregate implements
 
         // load widgets into {
         $themeLocator = $this->getThemeLocator();
-        $themeObject  = $themeLocator->getTheme();
+        $themeObject  = $themeLocator->getPreparedThemeObject();
 
         $sm = $this->sm;
 
@@ -185,10 +211,12 @@ class DefaultListenerAggregate implements
         return $return;
     }
 
+    // -------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * Get ThemeLocator
      *
-     * @return LocatorInterface
+     * @return LocatorDefaultInterface
      */
     public function getThemeLocator()
     {
@@ -205,7 +233,7 @@ class DefaultListenerAggregate implements
      *
      * @param LocatorInterface $themeLocator
      */
-    public function setThemeLocator(LocatorInterface $themeLocator)
+    public function setThemeLocator(LocatorDefaultInterface $themeLocator)
     {
         $this->themeLocator = $themeLocator;
     }
@@ -213,7 +241,7 @@ class DefaultListenerAggregate implements
     /**
      * Get Default Theme Locator for registered services in serviceManager
      *
-     * @return Theme\Locator
+     * @return Locator
      * @throws \Exception
      */
     protected function getDefaultThemeLocator()
@@ -226,10 +254,10 @@ class DefaultListenerAggregate implements
             );
         }
 
-        $defaultThemeLocator->setManager($this);
-
         return $defaultThemeLocator;
     }
+
+    // --- implemented methods ------------------------------------------------------------------------------------------------------------------
 
     /**
      * Detach all previously attached listeners

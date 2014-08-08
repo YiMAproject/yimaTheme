@@ -1,23 +1,21 @@
 <?php
 namespace yimaTheme\Theme;
 
-use yimaTheme\ManagerInterface;
+use Zend\Mvc\MvcEvent;
 
+/**
+ * Interface LocatorDefaultInterface
+ *
+ * @package yimaTheme\Theme
+ */
 interface LocatorDefaultInterface extends LocatorInterface
 {
     /**
-     * Inject ThemeManager
+     * Get layout name according to MvcEvent on EVENT_DISPATCH
      *
-     * @param ManagerInterface $manager ThemeManager Object Instance
+     * @param MvcEvent $e
      *
      * @return mixed
      */
-    public function setManager(ManagerInterface $manager);
-
-    /**
-     * Get Injected Theme Manager
-     *
-     * @return ManagerInterface
-     */
-    public function getManager();
+    public function getMvcLayout(MvcEvent $e);
 }

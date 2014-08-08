@@ -77,7 +77,7 @@ class Module implements
                 'yimaTheme\ThemeManager' => 'yimaTheme\Manager',
                     'yimaTheme\ThemeManager\ListenerAggregate' => 'yimaTheme\Manager\DefaultListenerAggregate',
                 'yimaTheme\ThemeLocator' => 'yimaTheme\Theme\Locator',
-                'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
+                    'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
             ),
         );
     }

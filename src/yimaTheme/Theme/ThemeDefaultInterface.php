@@ -1,8 +1,27 @@
 <?php
 namespace yimaTheme\Theme;
 
-interface ThemeDefaultInterface
+/**
+ * Interface ThemeDefaultInterface
+ *
+ * @package yimaTheme\Theme
+ */
+interface ThemeDefaultInterface extends ThemeInterface
 {
+    /**
+     * Initialize theme object if attained
+     *
+     * @return mixed
+     */
+    public function init();
+
+    /**
+     * Is theme object attained theme and initialized?
+     *
+     * @return boolean
+     */
+    public function isInitialized();
+
     /**
      * Set name of theme
      *
@@ -11,6 +30,31 @@ interface ThemeDefaultInterface
      * @return mixed
      */
     public function setName($name);
+
+    /**
+     * Set render layout name
+     *
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function setLayout($name);
+
+    /**
+     * Set dir to folder that store themes
+     *
+     * @param string $path dir path
+     *
+     * @return mixed
+     */
+    public function setThemesPath($path);
+
+    /**
+     * Path to themes folder
+     *
+     * @return string
+     */
+    public function getThemesPath();
 
     /*public function render($name);*/
 

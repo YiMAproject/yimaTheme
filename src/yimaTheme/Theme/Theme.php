@@ -1,16 +1,17 @@
 <?php
 namespace yimaTheme\Theme;
 
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
-use Zend\ServiceManager\ServiceManagerAwareInterface;
 
 /**
  * Class Theme
  * @package yimaTheme\Theme
  */
 class Theme implements
-    ThemeInterface,
-    ServiceManagerAwareInterface
+    ThemeDefaultInterface,
+    ServiceLocatorAwareInterface
 {
     /**
      * Theme name
@@ -63,18 +64,22 @@ class Theme implements
     }
 
     /**
-     * Initialize theme
+     * Initialize theme object if attained
      *
-     * initialize by theme locator on instancing theme object
+     * @return mixed
      */
-    public function initialize()
+    public function init()
     {
-        if ($this->initialized) {
+        if ($this->isInitialized()) {
             return $this;
         }
 
+        if (!$this->getThemesPath() || !$this->getName()) {
+            throw new \Exception('Theme Cant initialize because theme name or theme paths not present.');
+        }
+
         $themePathname = $this->getThemesPath().DS.$this->getName();
-        $configFile = $themePathname.DS.'theme.bootstrap.php';
+        $configFile    = $themePathname.DS.'theme.bootstrap.php';
         if (file_exists($configFile)) {
             include $configFile;
         }
@@ -85,25 +90,17 @@ class Theme implements
     }
 
     /**
-     * Mostaghiman file e marboot be option haaie theme raa mikhaanad
-     * @return array
-     * @deprecated
+     * Is theme object attained theme and initialized?
+     * : attained theme mean having theme name
+     *
+     * @return boolean
      */
-    protected function getOptions()
+    public function isInitialized()
     {
-        $themeConf = array();
-
-        $themePathname = $this->getThemesPath().DS.$this->getName();
-        $configFile = $themePathname.DS.'theme.config.php';
-        if (file_exists($configFile)) {
-            $themeConf = include $configFile;
-            $themeConf = (is_array($themeConf)) ? $themeConf : array();
-        }
-
-        return $themeConf;
+        return $this->initialized;
     }
 
-    // implemented methods --------------------------------------------------\
+    // --- implemented methods ---------------------------------------------------------------------------------------------------
 
     /**
      * Set name of theme
@@ -195,23 +192,22 @@ class Theme implements
         return (isset($this->params[$name])) ? $this->params[$name] : false;
     }
 
-
     /**
-     * Set service manager
+     * Set service locator
      *
-     * @param ServiceManager $serviceManager
+     * @param ServiceLocatorInterface $serviceLocator
      */
-    public function setServiceManager(ServiceManager $serviceManager)
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
-        $this->serviceManager = $serviceManager;
+        $this->serviceManager = $serviceLocator;
     }
 
     /**
-     * Get service manager
+     * Get service locator
      *
-     * @return ServiceManager
+     * @return ServiceLocatorInterface
      */
-    public function getServiceManager()
+    public function getServiceLocator()
     {
         return $this->serviceManager;
     }
