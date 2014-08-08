@@ -1,6 +1,8 @@
 <?php
 namespace yimaTheme\Theme;
 
+use yimaTheme\Manager;
+use yimaTheme\ManagerInterface;
 use yimaTheme\Resolvers\ConfigResolverAwareInterface;
 use yimaTheme\Resolvers\LocatorResolverAwareInterface;
 use yimaTheme\Resolvers\MvcResolverAwareInterface;
@@ -34,10 +36,23 @@ class Locator implements
     protected $name;
 
     /**
-     * @var ServiceManager\ServiceLocatorInterface
+     * Injected Theme Manager Instance Object
+     *
+     * @var Manager
+     */
+    protected $themeManager;
+
+    /**
+     * @var ServiceManager\ServiceManager
      */
     protected $serviceManager;
 
+    /**
+     * Initialize Theme Locator
+     * : invoked from themeManager::init
+     *
+     * @return $this
+     */
     public function init()
     {
         // by getting theme also we initialize theme
@@ -49,6 +64,8 @@ class Locator implements
             // initialize theme object
             $theme->initialize();
         }
+
+        return $this;
     }
 
     /**
@@ -238,28 +255,21 @@ class Locator implements
     }
 
     /**
-     * Set Manager config
-     * used by themeLocator
-     *
-     * @param array $config
-     *
-     * @return $this
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
      * Get default Manager theme_locator config
      *
      * @return array
      */
     public function getConfig()
     {
-        return $this->config;
+        // get default manager config used by default theme locator
+        $config = $this->getServiceLocator()->get('config');
+        if (isset($config['yima-theme']) && is_array($config['yima-theme'])) {
+            $config = $config['yima-theme'];
+        } else {
+            $config = array();
+        }
+
+        return $config;
     }
 
     /**
@@ -280,5 +290,29 @@ class Locator implements
     public function getServiceLocator()
     {
         return $this->serviceManager;
+    }
+
+    /**
+     * Inject ThemeManager
+     *
+     * @param ManagerInterface $manager ThemeManager Object Instance
+     *
+     * @return mixed
+     */
+    public function setManager(ManagerInterface $manager)
+    {
+        $this->themeManager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * Get Injected Theme Manager
+     *
+     * @return ManagerInterface
+     */
+    public function getManager()
+    {
+        return $this->themeManager;
     }
 }

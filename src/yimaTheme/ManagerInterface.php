@@ -1,8 +1,11 @@
 <?php
 namespace yimaTheme;
 
-use Zend\Mvc\MvcEvent;
-
+/**
+ * Interface ManagerInterface
+ *
+ * @package yimaTheme
+ */
 interface ManagerInterface
 {
     /**
@@ -10,5 +13,5 @@ interface ManagerInterface
      *
      * @return mixed
      */
-    public function init(MvcEvent $e);
+    public function init();
 }

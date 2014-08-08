@@ -33,7 +33,7 @@ class Theme implements
 
     /**
      * dir path that store themes
-     *
+
      * @var string
      */
     protected $themesPath;

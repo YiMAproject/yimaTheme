@@ -1,16 +1,23 @@
 <?php
 namespace yimaTheme\Theme;
 
+use yimaTheme\ManagerInterface;
+
 interface LocatorDefaultInterface extends LocatorInterface
 {
     /**
-     * Set theme_locator Config for default Locators
+     * Inject ThemeManager
      *
-     * @param array $config Merged config used by locator
+     * @param ManagerInterface $manager ThemeManager Object Instance
      *
      * @return mixed
      */
-    public function setConfig($config);
+    public function setManager(ManagerInterface $manager);
 
-    public function getConfig();
+    /**
+     * Get Injected Theme Manager
+     *
+     * @return ManagerInterface
+     */
+    public function getManager();
 }
