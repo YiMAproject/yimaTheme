@@ -34,6 +34,11 @@ class DefaultListenerAggregate implements
     protected $themeLocator;
 
     /**
+     * @var array Bootstraped Themes
+     */
+    protected $attainedThemes = array();
+
+    /**
      * Attach one or more listeners
      *
      * Implementors may add an optional $priority argument; the SharedEventManager
@@ -45,8 +50,8 @@ class DefaultListenerAggregate implements
     {
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this,'onMvcBootstrap'), 100000);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'addThemePathstack'),-95);
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'addThemePathstack'),-95);
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'onDispatchThemeBootstrap'), -95);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchThemeBootstrap'), -95);
 
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
@@ -62,6 +67,42 @@ class DefaultListenerAggregate implements
      * @param MvcEvent $e
      */
     public function onMvcBootstrap(MvcEvent $e) { }
+        
+    /**
+     * MVC Event Listener
+     * : bootstrap themes
+     *
+     * @param MvcEvent $e
+     */
+    public function onDispatchThemeBootstrap(MvcEvent $e) 
+    {
+        $this->checkMVC(); // test application startup config to match our need
+           
+        $pathStacks = array(); 
+        
+        $theme = $this->getThemeLocator()->getPreparedThemeObject();
+        while($theme) {
+            // store attained themes list
+            $this->attainedThemes[] = $theme;
+            $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName()
+            
+            // initialize theme bootstrap
+            if (!$theme->isInitialized())
+                $theme->init();
+            
+            if ($theme->isFinal())
+                break;
+            else {
+                // attain to next template
+                //$theme = $this->getThemeLocator()->getPreparedThemeObject();
+                $theme = false;
+            }
+        }
+        
+        // add path stacks
+        $pathStacks = array_reverse($pathStacks); // child top and finaltheme must list last
+        $this->addThemePathstack($pathStacks);
+    }
 
     /**
      * Add Requested template path to Stack of ViewTemplatePathStack
@@ -69,23 +110,12 @@ class DefaultListenerAggregate implements
      * @param MvcEvent $e
      * @throws \Exception
      */
-    public function addThemePathstack(MvcEvent $e = null)
+    protected function addThemePathstack(array $paths)
     {
-        $this->checkMVC(); // test application startup config to match our need
-
-        /** @var $theme ThemeDefaultInterface */
-        $theme = $this->getThemeLocator()->getPreparedThemeObject();
-        if (! $theme->isInitialized()) {
-            // we are not attained theme name
-            return;
+        $viewTemplatePathStack = $this->sm->get('ViewTemplatePathStack');
+        foreach ($paths as $path) {
+            $viewTemplatePathStack->addPath($path);
         }
-
-        $path = $theme->getThemesPath();
-        $path = $path .DS. $theme->getName();
-
-        $sl = ($e) ? $e->getApplication()->getServiceManager() : $this->sm;
-        $viewTemplatePathStack = $sl->get('ViewTemplatePathStack');
-        $viewTemplatePathStack->addPath($path);
     }
 
     /**

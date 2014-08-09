@@ -45,6 +45,14 @@ class Theme implements
     protected $serviceManager;
 
     protected $initialized = false;
+        
+    /**
+     * not Final theme only bootstraped and adding pathStack
+     * then fallBack to theme resolver till resolve Final 
+     * 
+     * @var boolean
+     */
+    protected $isFinal = true;
 
     /**
      * Constructor
@@ -98,6 +106,17 @@ class Theme implements
     public function isInitialized()
     {
         return $this->initialized;
+    }
+        
+    /**
+     * not Final theme only bootstraped and adding pathStack
+     * then fallBack to theme resolver till resolve Final 
+     * 
+     * @return boolean
+     */
+    public function isFinal()
+    {
+        return $this->isFinal;
     }
 
     // --- implemented methods ---------------------------------------------------------------------------------------------------

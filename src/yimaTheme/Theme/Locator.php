@@ -50,21 +50,22 @@ class Locator implements
     /**
      * Find Matched Theme and return object
      *
-     * @return Theme
+     * @return Theme|false
      */
     public function getPreparedThemeObject()
     {
-        $themeObject = $this->getThemeObject();
-
         $name = $this->attainThemeName();
-        if ($name) {
-            $themeObject->setName($name);
-            $themeObject->setThemesPath($this->attainPathName());
-
-            $themeObject->init();
+        $path = $this->attainPathName();
+        
+        $return = false;
+        if ($name && $path) {
+            // we are attained theme
+            $return = $this->getThemeObject();
+        	$return->setName($name);
+        	$return->setThemesPath($path);
         }
-
-        return $themeObject;
+        
+        return $return;
     }
 
     /**

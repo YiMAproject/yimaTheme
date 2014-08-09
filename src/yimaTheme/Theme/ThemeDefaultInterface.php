@@ -16,11 +16,19 @@ interface ThemeDefaultInterface extends ThemeInterface
     public function init();
 
     /**
-     * Is theme object attained theme and initialized?
+     * Is theme object initialized?
      *
      * @return boolean
      */
     public function isInitialized();
+    
+    /**
+     * not Final theme only bootstraped and adding pathStack
+     * then fallBack to theme resolver till resolve Final 
+     * 
+     * @return boolean
+     */
+    public function isFinalTheme();
 
     /**
      * Set name of theme

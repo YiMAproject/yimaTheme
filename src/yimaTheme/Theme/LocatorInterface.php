@@ -13,7 +13,7 @@ interface LocatorInterface
     /**
      * Find Matched Theme and return object
      *
-     * @return ThemeObject
+     * @return ThemeObject|false
      */
     public function getPreparedThemeObject();
 }
