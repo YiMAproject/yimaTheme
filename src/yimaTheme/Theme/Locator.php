@@ -3,13 +3,8 @@ namespace yimaTheme\Theme;
 
 use yimaTheme\Manager;
 use yimaTheme\ManagerInterface;
-use yimaTheme\Resolvers\ConfigResolverAwareInterface;
-use yimaTheme\Resolvers\LocatorResolverAwareInterface;
-use yimaTheme\Resolvers\MvcResolverAwareInterface;
+use yimaTheme\Resolvers;
 use Zend\Mvc\MvcEvent;
-
-use yimaTheme\Resolvers\Aggregate;
-
 use Zend\ServiceManager;
 
 class Locator implements
@@ -120,8 +115,8 @@ class Locator implements
             );
         }
 
-        $nameResolver = new Aggregate();
-        foreach ($config as $service=>$priority) {
+        $nameResolver = new Resolvers\Aggregate();
+        foreach ($config as $service => $priority) {
             if ($this->getServiceLocator()->has($service)) {
                 $service = $this->getServiceLocator()->get($service);
             } else {
@@ -132,21 +127,21 @@ class Locator implements
                 $service = new $service();
             }
 
-            if ($service instanceof LocatorResolverAwareInterface) {
+            if ($service instanceof Resolvers\LocatorResolverAwareInterface) {
                 // inject themeLocator to access config and other things by resolver
                 $service->setThemeLocator($this);
             }
 
-            if ($service instanceof ConfigResolverAwareInterface) {
+            if ($service instanceof Resolvers\ConfigResolverAwareInterface) {
                 // set yimaTheme config for resolver
                 $service->setConfig($this->getConfig());
             }
 
-            if ($service instanceof MvcResolverAwareInterface) {
+            if ($service instanceof Resolvers\MvcResolverAwareInterface) {
                 $service->setMvcEvent($e);
             }
 
-            $nameResolver->attach($service,$priority);
+            $nameResolver->attach($service, $priority);
         }
 
         $layout = $nameResolver->getName();
@@ -187,7 +182,7 @@ class Locator implements
             );
         }
 
-        $nameResolver = new Aggregate();
+        $nameResolver = new Resolvers\Aggregate();
         foreach ($config as $service => $priority)
         {
             if ($this->getServiceLocator()->has($service)) {
@@ -200,17 +195,17 @@ class Locator implements
                 $service = new $service();
             }
 
-            if ($service instanceof LocatorResolverAwareInterface) {
+            if ($service instanceof Resolvers\LocatorResolverAwareInterface) {
                 // inject themeLocator to access config and other things by resolver
                 $service->setThemeLocator($this);
             }
 
-            if ($service instanceof ConfigResolverAwareInterface) {
+            if ($service instanceof Resolvers\ConfigResolverAwareInterface) {
                 // set yimaTheme config for resolver
                 $service->setConfig($this->getConfig());
             }
 
-            $nameResolver->attach($service,$priority);
+            $nameResolver->attach($service, $priority);
         }
 
         $themeName = $nameResolver->getName();
