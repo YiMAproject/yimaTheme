@@ -48,20 +48,6 @@ class Locator implements
     protected $serviceManager;
 
     /**
-     * On Bootstrap MVC Event
-     * : registered by DefaultListenerAggregates
-     *
-     * @param MvcEvent $e MvcEvent
-     *
-     */
-    public function onMvcBootstrap(MvcEvent $e)
-    {
-        // by getting theme also we initialize theme
-        // to theme options to work
-        $this->getPreparedThemeObject();
-    }
-
-    /**
      * Find Matched Theme and return object
      *
      * @return Theme
