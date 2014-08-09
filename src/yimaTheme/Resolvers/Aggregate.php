@@ -88,6 +88,22 @@ class Aggregate implements
 		$this->queue->insert($detector, $priority);
 		return $this;
 	}
+        
+    public function dettach(ResolverInterface $detector)
+    {
+        $this->queue->remove($detector);
+        
+        return $this;
+    }
+        
+    public function dettachAll()
+    {
+        foreach($this->queue as $detector) {
+            $this->dettach($detector);
+        }
+            
+        return $this;
+    }
 
 	public function getLastStrategyFound()
 	{

@@ -78,9 +78,11 @@ class DefaultListenerAggregate implements
     {
         $this->checkMVC(); // test application startup config to match our need
            
+        $themeLocator = clone $this->getThemeLocator();
+        
         $pathStacks = array(); 
         
-        $theme = $this->getThemeLocator()->getPreparedThemeObject();
+        $theme = $themeLocator->getPreparedThemeObject();
         while($theme) {
             // store attained themes list
             $this->attainedThemes[] = $theme;
@@ -94,8 +96,12 @@ class DefaultListenerAggregate implements
                 break;
             else {
                 // attain to next template
-                //$theme = $this->getThemeLocator()->getPreparedThemeObject();
-                $theme = false;
+                
+                $lastStrategy = $themeLocator->getResolverObject()
+                    ->getLastStrategyFound();
+                $themeLocator->getResolverObject()->dettach($lastStrategy); // remove last detector
+                
+                $theme = $this->getThemeLocator()->getPreparedThemeObject();
             }
         }
         

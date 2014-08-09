@@ -143,7 +143,13 @@ class Locator implements
             );
         }
 
-        $resolver = new Resolvers\Aggregate();
+        if (isset($this->resolverObject[$state])) {
+            $resolver = $this->resolverObject[$state];
+            $resolver->dettachAll();
+        }
+        else 
+            $resolver = new Resolvers\Aggregate();
+        
         foreach ($config as $service => $priority)
         {
             if ($this->getServiceLocator()->has($service)) {
@@ -175,6 +181,7 @@ class Locator implements
             $resolver->attach($service, $priority);
         }
         
+        $this->resolverObject[$state]          = $resolver;
         $this->resolverObject['last_resolver'] = $resolver;
         
         return $resolver;
