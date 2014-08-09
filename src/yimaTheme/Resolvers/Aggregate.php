@@ -24,15 +24,18 @@ class Aggregate implements
 
 	/**
 	 * Constructor
-	 *
-	 * Instantiate the internal priority queue
-	 *
+	 * - Instantiate the internal priority queue
 	 */
 	public function __construct()
 	{
 		$this->queue = new PriorityQueue();
 	}
 
+    /**
+	 * Attain To Name based on strategy found in class
+	 * 
+	 * @return string|false
+	 */
 	public function getName()
 	{
 		if (0 === count($this->queue)) {

@@ -4,8 +4,9 @@ namespace yimaTheme\Resolvers;
 interface ResolverInterface
 {
 	/**
-	 * Get Current Name based on strategy found in class
+	 * Attain To Name based on strategy found in class
 	 * 
+	 * @return mixed|false
 	 */
     public function getName();
 }

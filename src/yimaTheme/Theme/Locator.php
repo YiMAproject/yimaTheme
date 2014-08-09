@@ -12,18 +12,6 @@ class Locator implements
     ServiceManager\ServiceLocatorAwareInterface
 {
     /**
-     * Default Manager theme_locator config
-     *
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var
-     */
-    protected $themeObject;
-
-    /**
      * Name of template
      *
      * @var string
@@ -31,16 +19,14 @@ class Locator implements
     protected $name;
 
     /**
-     * Injected Theme Manager Instance Object
-     *
-     * @var Manager
-     */
-    protected $themeManager;
-
-    /**
      * @var ServiceManager\ServiceManager
      */
     protected $serviceManager;
+    
+    /**
+     * @var array[Resolvers\Aggregate] Resolvers Aggregate
+     */
+    protected $resolverObject = array();
 
     /**
      * Find Matched Theme and return object
@@ -94,58 +80,9 @@ class Locator implements
      */
     public function getMvcLayout(MvcEvent $e)
     {
-        $config = $this->getConfig();
-        if (isset($config['theme_locator'])) {
-            $config = $config['theme_locator'];
-        } else {
-            $config = array();
-        }
-
-        if (isset($config['mvclayout_resolver_adapter'])) {
-            $config = $config['mvclayout_resolver_adapter'];
-        } else {
-            // use default layout name
-            return false;
-        }
-
-        // is string
-        if (is_string($config)) {
-            $config = array(
-                "{$config}" => 1
-            );
-        }
-
-        $nameResolver = new Resolvers\Aggregate();
-        foreach ($config as $service => $priority) {
-            if ($this->getServiceLocator()->has($service)) {
-                $service = $this->getServiceLocator()->get($service);
-            } else {
-                if (!class_exists($service)) {
-                    throw new \Exception("Layout Resolver '$service' not found for yimaTheme.");
-                }
-
-                $service = new $service();
-            }
-
-            if ($service instanceof Resolvers\LocatorResolverAwareInterface) {
-                // inject themeLocator to access config and other things by resolver
-                $service->setThemeLocator($this);
-            }
-
-            if ($service instanceof Resolvers\ConfigResolverAwareInterface) {
-                // set yimaTheme config for resolver
-                $service->setConfig($this->getConfig());
-            }
-
-            if ($service instanceof Resolvers\MvcResolverAwareInterface) {
-                $service->setMvcEvent($e);
-            }
-
-            $nameResolver->attach($service, $priority);
-        }
-
-        $layout = $nameResolver->getName();
-
+        $resolver = $this->getResolverObject('mvclayout_resolver_adapter', array('event_mvc' => $e));
+        
+        $layout = $resolver->getName();
         if (empty($layout) && ! ($layout === '0') ) {
             return false;
         }
@@ -162,6 +99,30 @@ class Locator implements
      */
     protected function attainThemeName()
     {
+        $themeName = $this->getResolverObject('resolver_adapter_service')
+            ->getName();
+
+        return (empty($themeName) && ! ($themeName === '0')) ? false : $themeName;
+    }
+    
+    /**
+     * Get Resolver Object used by Locator
+     * 
+     * @param string $state Setup configuration resolver
+     * 
+     * @return Resolvers\Aggregate
+     */
+    public function getResolverObject($state = null, array $options = array)
+    {
+        if ($state == null && isset($this->resolverObject['last_resolver'])) {
+            // latest invoked resolver
+            return $this->resolverObject['last_resolver'];
+        }
+        
+        if ($state != 'resolver_adapter_service' && $state != 'mvclayout_resolver_adapter')
+            throw new \Exception('Invalid state name provided.');
+        
+        // create resolver state object from config
         $config = $this->getConfig();
 
         if (isset($config['theme_locator'])) {
@@ -170,11 +131,11 @@ class Locator implements
             $config = array();
         }
 
-        if (!isset($config['resolver_adapter_service'])) {
-            throw new \Exception('Theme Resolver Service not present in config[resolver_adapter_service].');
+        if (!isset($config[$state])) {
+            throw new \Exception("Theme Resolver Service not present in config[$state].");
         }
 
-        $config = $config['resolver_adapter_service'];
+        $config = $config[$state];
         // is string, 'resolver_adapter' => 'resolver\service'
         if (is_string($config)) {
             $config = array(
@@ -182,7 +143,7 @@ class Locator implements
             );
         }
 
-        $nameResolver = new Resolvers\Aggregate();
+        $resolver = new Resolvers\Aggregate();
         foreach ($config as $service => $priority)
         {
             if ($this->getServiceLocator()->has($service)) {
@@ -204,13 +165,19 @@ class Locator implements
                 // set yimaTheme config for resolver
                 $service->setConfig($this->getConfig());
             }
+            
+            if (isset($options['event_mvc'])) {
+                if ($service instanceof Resolvers\MvcResolverAwareInterface) {
+                	$service->setMvcEvent($options['event_mvc']);
+            	}
+            }
 
-            $nameResolver->attach($service, $priority);
+            $resolver->attach($service, $priority);
         }
-
-        $themeName = $nameResolver->getName();
-
-        return (empty($themeName) && ! ($themeName === '0')) ? false : $themeName;
+        
+        $this->resolverObject['last_resolver'] = $resolver;
+        
+        return $resolver;
     }
 
     /**
