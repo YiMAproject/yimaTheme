@@ -53,8 +53,8 @@ class DefaultListenerAggregate implements
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'onDispatchThemeBootstrap'), -95);
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchThemeBootstrap'), -95);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'injectSpecLayout'),-99);
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'injectSpecLayout'),-99);
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'onDispatchSpecLayout'), -99);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'onDispatchSpecLayout'), -99);
 
 //        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_RENDER, array($this,'widgetizeIt'),-1000);
     }
@@ -84,7 +84,7 @@ class DefaultListenerAggregate implements
         while($theme) {
             // store attained themes list
             $this->attainedThemes[] = $theme;
-            $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName()
+            $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName();
             
             // initialize theme bootstrap
             if (!$theme->isInitialized())
@@ -123,7 +123,7 @@ class DefaultListenerAggregate implements
      *
      * @param MvcEvent $e
      */
-    public function injectSpecLayout(MvcEvent $e)
+    public function onDispatchSpecLayout(MvcEvent $e)
     {
         $model = $e->getResult();
         if (! $model instanceof ViewModel ) {
@@ -132,13 +132,13 @@ class DefaultListenerAggregate implements
 
         $themeLocator  = $this->getThemeLocator();
         $preparedTheme = $themeLocator->getPreparedThemeObject();
-        if (!$preparedTheme->isInitialized()) {
+        if (!$preparedTheme) {
             // we are not attained theme name
             return;
         }
-
+        
         // we want theme pathstack registered before
-        $this->addThemePathstack($e);
+        $this->onDispatchThemeBootstrap($e);     
 
         // get Layout from Locator
         $mvcLayout = $themeLocator->getMvcLayout($e);
