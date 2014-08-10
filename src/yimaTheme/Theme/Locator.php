@@ -112,7 +112,7 @@ class Locator implements
      * 
      * @return Resolvers\Aggregate
      */
-    public function getResolverObject($state = null, array $options = array)
+    public function getResolverObject($state = null, array $options = array())
     {
         if ($state == null && isset($this->resolverObject['last_resolver'])) {
             // latest invoked resolver

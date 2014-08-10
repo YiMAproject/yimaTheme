@@ -114,7 +114,7 @@ class Theme implements
      * 
      * @return boolean
      */
-    public function isFinal()
+    public function isFinalTheme()
     {
         return $this->isFinal;
     }

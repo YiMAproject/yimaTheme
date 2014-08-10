@@ -4,7 +4,6 @@ namespace yimaTheme\Manager;
 use yimaTheme\Theme\Locator;
 use yimaTheme\Theme\LocatorDefaultInterface;
 use yimaTheme\Theme\LocatorInterface;
-use yimaTheme\Theme\ThemeDefaultInterface;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
 use Zend\Http\PhpEnvironment\Response;
@@ -92,7 +91,7 @@ class DefaultListenerAggregate implements
             if (!$theme->isInitialized())
                 $theme->init();
             
-            if ($theme->isFinal())
+            if ($theme->isFinalTheme())
                 break;
             else {
                 // attain to next template
