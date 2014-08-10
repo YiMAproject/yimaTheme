@@ -41,7 +41,7 @@ class Locator implements
         $return = false;
         if ($name && $path) {
             // we are attained theme
-            $return = $this->getThemeObject();
+            $return = clone $this->getThemeObject();
         	$return->setName($name);
         	$return->setThemesPath($path);
         }
@@ -145,7 +145,10 @@ class Locator implements
 
         if (isset($this->resolverObject[$state])) {
             $resolver = $this->resolverObject[$state];
-            $resolver->dettachAll();
+
+            $this->resolverObject['last_resolver'] = $resolver;
+
+            return $resolver;
         }
         else 
             $resolver = new Resolvers\Aggregate();

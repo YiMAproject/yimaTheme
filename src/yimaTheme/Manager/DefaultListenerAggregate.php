@@ -76,7 +76,8 @@ class DefaultListenerAggregate implements
     public function onDispatchThemeBootstrap(MvcEvent $e) 
     {
         $this->checkMVC(); // test application startup config to match our need
-           
+
+        /** @var $themeLocator Locator */
         $themeLocator = clone $this->getThemeLocator();
         
         $pathStacks = array(); 
@@ -95,12 +96,12 @@ class DefaultListenerAggregate implements
                 break;
             else {
                 // attain to next template
-                
                 $lastStrategy = $themeLocator->getResolverObject()
                     ->getLastStrategyFound();
-                $themeLocator->getResolverObject()->dettach($lastStrategy); // remove last detector
-                
-                $theme = $this->getThemeLocator()->getPreparedThemeObject();
+                $themeLocator->getResolverObject()
+                    ->dettach($lastStrategy); // remove last detector
+
+                $theme = $themeLocator->getPreparedThemeObject();
             }
         }
         

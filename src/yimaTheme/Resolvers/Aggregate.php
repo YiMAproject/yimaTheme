@@ -92,7 +92,7 @@ class Aggregate implements
     public function dettach(ResolverInterface $detector)
     {
         $this->queue->remove($detector);
-        
+
         return $this;
     }
         
