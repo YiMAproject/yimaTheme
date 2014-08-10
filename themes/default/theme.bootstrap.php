@@ -5,6 +5,8 @@ use Zend\Mvc\MvcEvent;
  * @var $this \yimaTheme\Theme\Theme
  */
 
+$this->isFinal = false;
+
 /** @var $sm \Zend\ServiceManager\ServiceManager */
 $sm = $this->getServiceLocator();
 
