@@ -45,7 +45,7 @@ class Theme implements
     protected $serviceManager;
 
     protected $initialized = false;
-        
+
     /**
      * not Final theme only bootstraped and adding pathStack
      * then fallBack to theme resolver till resolve Final 
@@ -53,6 +53,11 @@ class Theme implements
      * @var boolean
      */
     protected $isFinal = true;
+
+    /**
+     * @var ThemeDefaultInterface Child Theme
+     */
+    protected $child;
 
     /**
      * Constructor
@@ -182,6 +187,40 @@ class Theme implements
     public function getThemesPath()
     {
         return $this->themesPath;
+    }
+
+    /**
+     * Set Child Theme
+     *
+     * @param ThemeDefaultInterface $theme
+     *
+     * @return $this
+     */
+    public function setChild(ThemeDefaultInterface $theme)
+    {
+        $this->child = $theme;
+
+        return $this;
+    }
+
+    /**
+     * Has Child Theme ?
+     *
+     * @return boolean
+     */
+    public function hasChild()
+    {
+        return (isset($this->child) && $this->child instanceof ThemeDefaultInterface);
+    }
+
+    /**
+     * Get Child Theme
+     *
+     * @return ThemeDefaultInterface
+     */
+    public function getChild()
+    {
+        return $this->child;
     }
 
     /**

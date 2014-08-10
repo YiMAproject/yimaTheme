@@ -64,7 +64,28 @@ interface ThemeDefaultInterface extends ThemeInterface
      */
     public function getThemesPath();
 
-    /*public function render($name);*/
+    /**
+     * Set Child Theme
+     *
+     * @param ThemeDefaultInterface $theme
+     *
+     * @return $this
+     */
+    public function setChild(ThemeDefaultInterface $theme);
+
+    /**
+     * Has Child Theme ?
+     *
+     * @return boolean
+     */
+    public function hasChild();
+
+    /**
+     * Get Child Theme
+     *
+     * @return ThemeDefaultInterface
+     */
+    public function getChild();
 
     /**
      * Used for passing some params variable between each action during MvcEvents.
@@ -76,8 +97,17 @@ interface ThemeDefaultInterface extends ThemeInterface
      *
      * @param $name
      * @param $value
+     *
+     * @return $this
      */
     public function setParam($name, $value);
 
+    /**
+     * Get Param
+     *
+     * @param string $name Param Name
+     *
+     * @return mixed
+     */
     public function getParam($name);
 }

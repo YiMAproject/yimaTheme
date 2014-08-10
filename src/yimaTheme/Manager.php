@@ -1,6 +1,7 @@
 <?php
 namespace yimaTheme;
 
+use yimaTheme\Theme\Theme;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -30,6 +31,11 @@ class Manager implements
     protected $isInitialized;
 
     /**
+     * @var Theme Prepared Theme Object
+     */
+    protected $themeObject = false;
+
+    /**
      * Init Theme Manager To Work
      *
      * @return $this
@@ -44,6 +50,10 @@ class Manager implements
         /** @var $sharedEvents \Zend\EventManager\SharedEventManager */
         $sm = $this->getServiceManager();
         $defaultListeners = $sm->get('yimaTheme\ThemeManager\ListenerAggregate');
+        if ($defaultListeners instanceof self) {
+            // inject themeManager
+            $defaultListeners->manager = $this;
+        }
 
         $sharedEvents = $this->getEventManager()->getSharedManager();
         $sharedEvents->attachAggregate($defaultListeners);
@@ -61,6 +71,16 @@ class Manager implements
     public function isInitialized()
     {
         return $this->isInitialized;
+    }
+
+    /**
+     * Get Prepared Theme Object
+     *
+     * @return Theme
+     */
+    public function getThemeObject()
+    {
+        return $this->themeObject;
     }
 
     // -- implementation methods --------------------------------------------------------------------------------------

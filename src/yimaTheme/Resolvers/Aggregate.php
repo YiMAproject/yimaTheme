@@ -16,7 +16,7 @@ class Aggregate implements
 	protected $queue;
 	
 	/**
-	 * Last Detector found in Quee
+	 * Last Detector found in queue
 	 * 
 	 * @var ResolverInterface
 	 */
@@ -42,7 +42,8 @@ class Aggregate implements
 			return false;
 		}
 
-		foreach ($this->queue as $detector) {
+        /** @var $detector ResolverInterface */
+        foreach ($this->queue as $detector) {
 			$name = $detector->getName();
 			if (empty($name) && $name !== '0') {
 				// No resource found; try next resolver

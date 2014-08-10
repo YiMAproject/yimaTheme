@@ -1,5 +1,6 @@
 <?php
 namespace yimaTheme;
+use yimaTheme\Theme\ThemeInterface;
 
 /**
  * Interface ManagerInterface
@@ -14,4 +15,12 @@ interface ManagerInterface
      * @return mixed
      */
     public function init();
+
+    /**
+     * Get Theme Object
+     * : share across application by helpers
+     *
+     * @return ThemeInterface
+     */
+    public function getThemeObject();
 }

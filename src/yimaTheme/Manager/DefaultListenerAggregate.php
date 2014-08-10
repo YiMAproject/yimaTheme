@@ -1,6 +1,7 @@
 <?php
 namespace yimaTheme\Manager;
 
+use yimaTheme\Manager;
 use yimaTheme\Theme\Locator;
 use yimaTheme\Theme\LocatorDefaultInterface;
 use yimaTheme\Theme\LocatorInterface;
@@ -18,7 +19,7 @@ use Zend\View\Resolver as ViewResolver;
  *
  * @package yimaTheme\Manager
  */
-class DefaultListenerAggregate implements
+class DefaultListenerAggregate extends Manager implements
     SharedListenerAggregateInterface,
     ServiceManagerAwareInterface
 {
@@ -36,6 +37,8 @@ class DefaultListenerAggregate implements
      * @var array Bootstraped Themes
      */
     protected $attainedThemes = array();
+
+    protected $manager;
 
     /**
      * Attach one or more listeners
@@ -78,7 +81,7 @@ class DefaultListenerAggregate implements
         $this->checkMVC(); // test application startup config to match our need
 
         /** @var $themeLocator Locator */
-        $themeLocator = clone $this->getThemeLocator();
+        $themeLocator = $this->getThemeLocator();
         
         $pathStacks = array(); 
         
@@ -95,6 +98,8 @@ class DefaultListenerAggregate implements
             if ($theme->isFinalTheme())
                 break;
             else {
+                $childTheme = $theme;
+
                 // attain to next template
                 $lastStrategy = $themeLocator->getResolverObject()
                     ->getLastStrategyFound();
@@ -102,12 +107,22 @@ class DefaultListenerAggregate implements
                     ->dettach($lastStrategy); // remove last detector
 
                 $theme = $themeLocator->getPreparedThemeObject();
+                if ($theme)
+                    $theme->setChild($childTheme);
             }
         }
-        
+
+        // set themeObject to themeManager
+        $this->manager->themeObject = $theme;
+
         // add path stacks
-        $pathStacks = array_reverse($pathStacks); // child top and finaltheme must list last
+        $pathStacks = array_reverse($pathStacks); // child top and final theme must list last
         $this->addThemePathstack($pathStacks);
+    }
+
+    protected function setThemeManager(Manager $themeManager)
+    {
+        $this->manager = $themeManager;
     }
 
     /**
@@ -267,10 +282,16 @@ class DefaultListenerAggregate implements
      * Set ThemeLocator
      *
      * @param LocatorInterface $themeLocator
+     *
+     * @return $this
      */
     public function setThemeLocator(LocatorDefaultInterface $themeLocator)
     {
+        $this->sm->setInvokableClass('yimaTheme\ThemeLocator', $themeLocator);
+
         $this->themeLocator = $themeLocator;
+
+        return $this;
     }
 
     /**
