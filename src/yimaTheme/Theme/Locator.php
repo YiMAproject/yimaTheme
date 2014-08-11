@@ -2,7 +2,6 @@
 namespace yimaTheme\Theme;
 
 use yimaTheme\Manager;
-use yimaTheme\ManagerInterface;
 use yimaTheme\Resolvers;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager;

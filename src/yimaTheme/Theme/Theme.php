@@ -92,6 +92,9 @@ class Theme implements
         }
 
         $themePathname = $this->getThemesPath().DS.$this->getName();
+        if (!is_dir($themePathname))
+            throw new \Exception(sprintf('Theme "%s" not found in "%s".', $this->getName(), $themePathname));
+
         $configFile    = $themePathname.DS.'theme.bootstrap.php';
         if (file_exists($configFile)) {
             include $configFile;
