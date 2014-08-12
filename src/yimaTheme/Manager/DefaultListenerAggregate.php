@@ -11,6 +11,7 @@ use Zend\Http\PhpEnvironment\Response;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
+use Zend\Stdlib\ArrayUtils;
 use Zend\View\Model\ViewModel;
 use Zend\View\Resolver as ViewResolver;
 
@@ -38,6 +39,9 @@ class DefaultListenerAggregate extends Manager implements
      */
     protected $attainedThemes = array();
 
+    /**
+     * @var Manager
+     */
     protected $manager;
 
     /**
@@ -50,15 +54,15 @@ class DefaultListenerAggregate extends Manager implements
      */
     public function attachShared(SharedEventManagerInterface $events)
     {
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this,'onMvcBootstrap'), 100000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this, 'onMvcBootstrap'), 100000);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this,'onDispatchThemeBootstrap'), -95);
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this, 'onDispatchThemeBootstrap'), -95);
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchThemeBootstrap'), -95);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this,'onDispatchSpecLayout'), -99);
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR,array($this,'onDispatchSpecLayout'), -99);
+        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this, 'onDispatchSpecLayout'), -99);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchSpecLayout'), -99);
 
-//        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_RENDER, array($this,'widgetizeIt'),-1000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetizer'), -1000);
     }
 
     // --- Events Methods ---------------------------------------------------------------------------------------------------------------------
@@ -152,14 +156,14 @@ class DefaultListenerAggregate extends Manager implements
         }
 
         $themeLocator  = $this->getThemeLocator();
-        $preparedTheme = $themeLocator->getPreparedThemeObject();
+        $preparedTheme = $this->manager->getThemeObject();
         if (!$preparedTheme) {
             // we are not attained theme name
             return;
         }
         
         // we want theme pathstack registered before
-        $this->onDispatchThemeBootstrap($e);     
+        #$this->onDispatchThemeBootstrap($e);
 
         // get Layout from Locator
         $mvcLayout = $themeLocator->getMvcLayout($e);
@@ -176,7 +180,13 @@ class DefaultListenerAggregate extends Manager implements
         // else { let other events do somethings .... }
     }
 
-    public function widgetizeIt(MvcEvent $e)
+    /**
+     * Insert Defined Widgets into Layout Sections(area)
+     *
+     * @param MvcEvent $e MVC Event
+     * @throws \Exception
+     */
+    public function onRenderWidgetizer(MvcEvent $e)
     {
         $result = $e->getResult();
         if ($result instanceof Response) {
@@ -189,17 +199,29 @@ class DefaultListenerAggregate extends Manager implements
         }
 
         // load widgets into {
-        $themeLocator = $this->getThemeLocator();
-        $themeObject  = $themeLocator->getPreparedThemeObject();
+        $themeObject  = $this->manager->getThemeObject();
 
         $sm = $this->sm;
 
-        $config       = $themeLocator->getConfig();
-        $config       = $config['themes'];
-        $themeName = $themeObject->getName();
-        $config       = (isset($config[$themeName])) ? $config[$themeName] : array();
-        $layout       = $viewModel->getTemplate();
-        $areas = isset($config['widgets'][$layout]) ? $config['widgets'][$layout] : array();
+        /*
+         * [
+         *  'layout_name' =>
+         *      [
+         *          'area' => [
+         *              toStringObject,
+         *              ViewModel,
+         *          ]
+         *      ]
+         * ]
+         */
+        $widgetsContainer = array();
+        do {
+            // get merged widgets of child themes
+            $widgetsContainer = ArrayUtils::merge($widgetsContainer, (array) $themeObject->getParam('widgets'));
+        } while($themeObject = $themeObject->getChild());
+
+        $layout           = $viewModel->getTemplate();
+        $areas            = isset($widgetsContainer[$layout]) ? $widgetsContainer[$layout] : array();
         foreach($areas as $area => $widgets)
         {
             if (! is_array($widgets) ) {
@@ -208,18 +230,26 @@ class DefaultListenerAggregate extends Manager implements
             }
 
             foreach ($widgets as $w) {
-                if (is_string($w) && $sm->has($w)) {
-                    $w = $sm->get($w);
-                    if (is_object($w) && method_exists($w,'__toString')) {
-                        $w = (string) $w;
-                    }
+                if (is_string($w)) {
+                    if ($sm->has($w))
+                        $w = $sm->get($w);
+                    elseif (class_exists($w))
+                        $w = new $w();
                 }
 
-                if ($w instanceof ViewModel) {
-                    $viewModel->addChild($w, $area, true);
-                } else if (is_string($w)) {
-                    $viewModel->{$area} .= $w;
+                if (is_object($w)) {
+                    if ($w instanceof ViewModel)
+                        $viewModel->addChild($w, $area, true);
+                    elseif (method_exists($w, '__toString'))
+                        $w = (string) $w;
+                    else
+                        throw new \Exception('Invalid Widget Provided, Widget "'.get_class($w).'" is not toString implemented or ViewModel instance.');
                 }
+
+                if (is_string($w))
+                    $viewModel->{$area} .= $w;
+                elseif (! $w instanceof ViewModel)
+                    throw new \Exception('Invalid Widget Provided, Widget "'.gettype($w).'"');
             }
         }
     }

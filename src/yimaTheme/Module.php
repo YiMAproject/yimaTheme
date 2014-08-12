@@ -32,9 +32,9 @@ class Module implements
      * @param  ModuleManagerInterface $manager
      * @return void
      */
-    public function init(ModuleManagerInterface $moduleManager)
+    public function init(ModuleManagerInterface $moduleModuleManager)
     {
-        $events = $moduleManager->getEventManager();
+        $events = $moduleModuleManager->getEventManager();
         $events->attach(
             ModuleEvent::EVENT_LOAD_MODULES_POST,
             array($this,'initThemeManager'),
