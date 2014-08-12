@@ -158,7 +158,7 @@ class DefaultListenerAggregate extends Manager implements
         $themeLocator  = $this->getThemeLocator();
         $preparedTheme = $this->manager->getThemeObject();
         if (!$preparedTheme) {
-            // we are not attained theme name
+            // we are not attained theme
             return;
         }
         
@@ -200,6 +200,10 @@ class DefaultListenerAggregate extends Manager implements
 
         // load widgets into {
         $themeObject  = $this->manager->getThemeObject();
+        if (!$themeObject) {
+            // we are not attained theme
+            return;
+        }
 
         $sm = $this->sm;
 
