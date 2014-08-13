@@ -1,5 +1,6 @@
 <?php
 namespace yimaTheme\Theme;
+use Poirot\Dataset\Entity;
 
 /**
  * Interface ThemeDefaultInterface
@@ -86,6 +87,13 @@ interface ThemeDefaultInterface extends ThemeInterface
      * @return ThemeDefaultInterface
      */
     public function getChild();
+
+    /**
+     * Get Options Object Entity
+     *
+     * @return Entity
+     */
+    public function options();
 
     /**
      * Used for passing some params variable between each action during MvcEvents.

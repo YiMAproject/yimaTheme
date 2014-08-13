@@ -54,7 +54,7 @@ class Module implements
         // $sharedEvents = $moduleManager->getEventManager()->getSharedManager();
 
         $sm = $moduleManager->getEvent()->getParam('ServiceManager');
-        $themManager = $sm->get('yimatheme\ThemeManager');
+        $themManager = $sm->get('yimaTheme.Manager');
         if (!$themManager instanceof ManagerInterface) {
             throw new \Exception(
                 sprintf('yimaTheme theme manager most instance of "ManagerInterface" but "%s" given.', get_class($themManager))
@@ -74,7 +74,7 @@ class Module implements
     {
         return array (
             'invokables' => array (
-                'yimaTheme\ThemeManager' => 'yimaTheme\Manager',
+                'yimaTheme.Manager' => 'yimaTheme\Manager',
                     'yimaTheme\ThemeManager\ListenerAggregate' => 'yimaTheme\Manager\DefaultListenerAggregate',
                 'yimaTheme\ThemeLocator' => 'yimaTheme\Theme\Locator',
                     'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',

@@ -1,6 +1,7 @@
 <?php
 namespace yimaTheme\Theme;
 
+use Poirot\Dataset\Entity;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -58,6 +59,11 @@ class Theme implements
      * @var ThemeDefaultInterface Child Theme
      */
     protected $child;
+
+    /**
+     * @var Entity Theme Options Entity
+     */
+    protected $options;
 
     /**
      * Constructor
@@ -227,6 +233,20 @@ class Theme implements
     }
 
     /**
+     * Get Options Object Entity
+     *
+     * @return Entity
+     */
+    public function options()
+    {
+        if (!$this->options) {
+            $this->options = new Entity();
+        }
+
+        return $this->options;
+    }
+
+    /**
      * Used for passing some params variable between each action during MvcEvents.
      *
      *  zmani hast ke manager ehtiaj daarad maghaadiri raa be locator ersaal konad
@@ -246,11 +266,11 @@ class Theme implements
         return $this;
     }
 
-    public function getParam($name)
+    public function getParam($name, $default = null)
     {
         $name = strtolower($name);
 
-        return (isset($this->params[$name])) ? $this->params[$name] : false;
+        return (isset($this->params[$name])) ? $this->params[$name] : $default;
     }
 
     /**
