@@ -35,7 +35,7 @@ class DefaultListenerAggregate extends Manager implements
     protected $themeLocator;
 
     /**
-     * @var array Bootstraped Themes
+     * @var array Initialized Themes
      */
     protected $attainedThemes = array();
 
@@ -62,7 +62,7 @@ class DefaultListenerAggregate extends Manager implements
         $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this, 'onDispatchSpecLayout'), -99);
         $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchSpecLayout'), -99);
 
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetizer'), -1000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this, 'onRenderWidgetator'), -9000);
     }
 
     // --- Events Methods ---------------------------------------------------------------------------------------------------------------------
@@ -82,6 +82,10 @@ class DefaultListenerAggregate extends Manager implements
      */
     public function onDispatchThemeBootstrap(MvcEvent $e) 
     {
+        $r = $e->getResult();
+        if (!$r instanceof ViewModel)
+            return; // we don't get Renderer Result
+
         $this->checkMVC(); // test application startup config to match our need
 
         /** @var $themeLocator Locator */
@@ -132,8 +136,8 @@ class DefaultListenerAggregate extends Manager implements
     /**
      * Add Requested template path to Stack of ViewTemplatePathStack
      *
-     * @param MvcEvent $e
-     * @throws \Exception
+     * @param array $paths
+     * @internal param \Zend\Mvc\MvcEvent $e
      */
     protected function addThemePathstack(array $paths)
     {
@@ -150,10 +154,9 @@ class DefaultListenerAggregate extends Manager implements
      */
     public function onDispatchSpecLayout(MvcEvent $e)
     {
-        $model = $e->getResult();
-        if (! $model instanceof ViewModel ) {
+        $r = $e->getResult();
+        if (! $r instanceof ViewModel )
             return;
-        }
 
         $themeLocator  = $this->getThemeLocator();
         $preparedTheme = $this->manager->getThemeObject();
@@ -162,7 +165,7 @@ class DefaultListenerAggregate extends Manager implements
             return;
         }
         
-        // we want theme pathstack registered before
+        // we want theme path stack registered before
         #$this->onDispatchThemeBootstrap($e);
 
         // get Layout from Locator
@@ -174,10 +177,10 @@ class DefaultListenerAggregate extends Manager implements
 
         $layout = $preparedTheme->getLayout();
         if ($layout) {
+            // Change Layout Of Page
             $model = $e->getViewModel();
             $model->setTemplate($layout);
         }
-        // else { let other events do somethings .... }
     }
 
     /**
@@ -186,7 +189,7 @@ class DefaultListenerAggregate extends Manager implements
      * @param MvcEvent $e MVC Event
      * @throws \Exception
      */
-    public function onRenderWidgetizer(MvcEvent $e)
+    public function onRenderWidgetator(MvcEvent $e)
     {
         $result = $e->getResult();
         if ($result instanceof Response) {
@@ -259,8 +262,7 @@ class DefaultListenerAggregate extends Manager implements
     }
 
     /**
-     * Check mikonad ke aayaa in theme manager mitavaanad ba tavajoh
-     * be saakhtar e load shodan e konooni e system kaar konad?
+     * Check Current MVC View Resolver To Match With Class Strategy
      *
      * @return bool
      * @throws \Exception
@@ -315,7 +317,7 @@ class DefaultListenerAggregate extends Manager implements
     /**
      * Set ThemeLocator
      *
-     * @param LocatorInterface $themeLocator
+     * @param LocatorDefaultInterface $themeLocator
      *
      * @return $this
      */
