@@ -29,7 +29,8 @@ class Module implements
     /**
      * Initialize workflow
      *
-     * @param  ModuleManagerInterface $manager
+     * @param \Zend\ModuleManager\ModuleManagerInterface $moduleModuleManager
+     * @internal param \Zend\ModuleManager\ModuleManagerInterface $manager
      * @return void
      */
     public function init(ModuleManagerInterface $moduleModuleManager)
@@ -40,12 +41,33 @@ class Module implements
             array($this,'initThemeManager'),
             -100000
         );
+
+        $events->attach(
+            ModuleEvent::EVENT_LOAD_MODULES_POST,
+            array($this,'onLoadModulesPostAddServices'),
+            -100000
+        );
+    }
+
+    /**
+    * @param ModuleEvent $e
+    */
+    public function onLoadModulesPostAddServices(ModuleEvent $e)
+    {
+        /** @var $moduleManager \Zend\ModuleManager\ModuleManager */
+        $moduleManager = $e->getTarget();
+        // $sharedEvents = $moduleManager->getEventManager()->getSharedManager();
+
+        /** @var $sm ServiceManager */
+        $sm      = $moduleManager->getEvent()->getParam('ServiceManager');
+        $sm->setInvokableClass('yimaTheme\ThemeObject', 'yimaTheme\Theme\Theme', false);
     }
 
     /**
      * Get Theme Manager Service and init them
      *
      * @param ModuleEvent $e
+     * @throws \Exception
      */
     public function initThemeManager(ModuleEvent $e)
     {
@@ -77,7 +99,12 @@ class Module implements
                 'yimaTheme.Manager' => 'yimaTheme\Manager',
                     'yimaTheme\ThemeManager\ListenerAggregate' => 'yimaTheme\Manager\DefaultListenerAggregate',
                 'yimaTheme\ThemeLocator' => 'yimaTheme\Theme\Locator',
-                    'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
+                    // because of this is shared serv. and with cloning problem -
+                    // (we have to reset each objects).
+                    // this model service set with service method with share by -
+                    // default set to false
+                    // on init module
+                    # 'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
             ),
         );
     }

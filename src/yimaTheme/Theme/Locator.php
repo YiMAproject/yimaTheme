@@ -40,7 +40,7 @@ class Locator implements
         $return = false;
         if ($name && $path) {
             // we are attained theme
-            $return = clone $this->getThemeObject();
+            $return = $this->getThemeObject();
         	$return->setName($name);
         	$return->setThemesPath($path);
         }
@@ -107,9 +107,10 @@ class Locator implements
     /**
      * Get Resolver Object used by Locator
      * 
-     * @param string $state Setup configuration resolver
-     * 
+     * @param string $state   Setup configuration resolver
+     * @param array  $options Options
      * @return Resolvers\Aggregate
+     * @throws \Exception
      */
     public function getResolverObject($state = null, array $options = array())
     {
