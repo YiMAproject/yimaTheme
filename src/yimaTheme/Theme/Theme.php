@@ -41,9 +41,9 @@ class Theme extends ViewModel
     protected $isFinal = true;
 
     /**
-     * @var Entity Theme Options Entity
+     * @var Entity Theme Configs Entity
      */
-    protected $options;
+    protected $config;
 
     /**
      * @var ServiceManager
@@ -185,11 +185,11 @@ class Theme extends ViewModel
      */
     public function config()
     {
-        if (!$this->options) {
-            $this->options = new Entity();
+        if (!$this->config) {
+            $this->config = new Entity();
         }
 
-        return $this->options;
+        return $this->config;
     }
 
     /**
