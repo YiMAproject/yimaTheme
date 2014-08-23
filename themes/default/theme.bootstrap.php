@@ -6,20 +6,7 @@ use Zend\Mvc\MvcEvent;
  */
 
 $this->isFinal = false;
-
-/*
- * [
- *  'layout_name' =>
- *      [
- *          'area' => [
- *              toStringObject,
- *              ViewModel,
- *          ]
- *      ]
- * ]
- */
-$this->setParam('widgets', array());
-
+//$this->setCaptureTo('content');
 
 /** @var $sm \Zend\ServiceManager\ServiceManager */
 $sm = $this->getServiceLocator();
