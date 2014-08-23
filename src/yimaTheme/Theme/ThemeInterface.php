@@ -13,9 +13,9 @@ interface ThemeInterface
     /**
      * Get render layout name
      *
-     * @param $name
+     * @internal param $name
      *
      * @return string
      */
-    public function getLayout();
+    public function getTemplate();
 }

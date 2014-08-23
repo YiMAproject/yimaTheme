@@ -50,6 +50,8 @@ class Locator implements
 
     /**
      * Get ThemeObject
+     * : it must be unique new instance object theme -
+     *   on each get request
      *
      * @return Theme
      * @throws \Exception

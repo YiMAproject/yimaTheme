@@ -118,8 +118,8 @@ class Module implements
     public function getViewHelperConfig()
     {
         return array(
-            'factories' => array(
-                'theme' => 'yimaTheme\View\Helper\ThemeHelperFactory',
+            'invokables' => array(
+                'theme' => 'yimaTheme\View\Helper\ThemeHelper',
             ),
         );
     }

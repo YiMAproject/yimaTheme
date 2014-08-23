@@ -87,7 +87,7 @@ class DefaultListenerAggregate extends Manager implements
         $this->checkMVC(); // test application startup config to match our need
 
         /** @var $themeLocator Locator */
-        $themeLocator = $this->getThemeLocator();
+        $themeLocator = clone $this->getThemeLocator(); // we have to detach strategies
         
         $pathStacks = array(); 
         
@@ -96,11 +96,10 @@ class DefaultListenerAggregate extends Manager implements
             // store attained themes list
             $this->attainedThemes[] = $theme;
             $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName();
-            
+
             // initialize theme bootstrap
             if (!$theme->isInitialized())
                 $theme->init();
-            
             if ($theme->isFinalTheme())
                 break;
             else {
@@ -114,12 +113,16 @@ class DefaultListenerAggregate extends Manager implements
 
                 $theme = $themeLocator->getPreparedThemeObject();
                 if ($theme)
-                    $theme->setChild($childTheme);
+                    $theme->addChild($childTheme, null, true);
             }
         }
 
-        // set themeObject to themeManager
-        $this->manager->themeObject = $theme;
+        // set themeObject as ViewModel
+        $defTemplate = $e->getViewModel()
+            ->getTemplate();
+        if (!$theme->getTemplate())
+            $theme->setTemplate($defTemplate); // set default template name
+        $e->setViewModel($theme);
 
         // add path stacks
         $pathStacks = array_reverse($pathStacks); // child top and final theme must list last
@@ -156,13 +159,10 @@ class DefaultListenerAggregate extends Manager implements
         if (! $r instanceof ViewModel )
             return;
 
+        $model = $e->getViewModel();
+
         $themeLocator  = $this->getThemeLocator();
-        $preparedTheme = $this->manager->getThemeObject();
-        if (!$preparedTheme) {
-            // we are not attained theme
-            return;
-        }
-        
+
         // we want theme path stack registered before
         #$this->onDispatchThemeBootstrap($e);
 
@@ -170,14 +170,7 @@ class DefaultListenerAggregate extends Manager implements
         $mvcLayout = $themeLocator->getMvcLayout($e);
         if ($mvcLayout) {
             // we want same on theme layout name if not set
-            $preparedTheme->setLayout($mvcLayout);
-        }
-
-        $layout = $preparedTheme->getLayout();
-        if ($layout) {
-            // Change Layout Of Page
-            $model = $e->getViewModel();
-            $model->setTemplate($layout);
+            $model->setTemplate($mvcLayout);
         }
     }
 

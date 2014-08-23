@@ -12,33 +12,14 @@ use Zend\View\Helper\AbstractHelper;
 class ThemeHelper extends AbstractHelper
 {
     /**
-     * @var LocatorDefaultInterface
-     */
-    protected $themeLocator;
-
-    /**
-     * @var ThemeDefaultInterface
-     */
-    protected $themeObject;
-
-
-    /**
-     * Construct
-     *
-     * @param ThemeDefaultInterface $themeObject
-     */
-    public function __construct(ThemeDefaultInterface $themeObject)
-    {
-        $this->themeObject  = $themeObject;
-    }
-
-    /**
      * Class act as functor
      *
      * @return ThemeDefaultInterface
      */
     public function __invoke()
     {
-        return $this->themeObject;
+        return $this->getView()
+            ->plugin('view_model')
+                ->getCurrent();
     }
 }
