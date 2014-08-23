@@ -120,6 +120,20 @@ class Theme extends ViewModel
     }
 
     /**
+     * Set Final Theme Flag
+     *
+     * @param bool $bool Final Theme Flag
+     *
+     * @return $this
+     */
+    public function setFinalTheme($bool = true)
+    {
+        $this->isFinal = (boolean) $bool;
+
+        return $this;
+    }
+
+    /**
      * Set name of theme
      *
      * @param string $name

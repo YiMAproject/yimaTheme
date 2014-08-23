@@ -115,6 +115,8 @@ class DefaultListenerAggregate extends Manager implements
                 $theme = $themeLocator->getPreparedThemeObject();
                 if ($theme)
                     $theme->addChild($childTheme, null, true);
+                else
+                    $theme = $childTheme->setFinalTheme(); // we have not other theme after this child
             }
         }
 

@@ -35,6 +35,15 @@ interface ThemeDefaultInterface extends
     public function isFinalTheme();
 
     /**
+     * Set Final Theme Flag
+     *
+     * @param bool $bool Final Theme Flag
+     *
+     * @return $this
+     */
+    public function setFinalTheme($bool = true);
+
+    /**
      * Set name of theme
      *
      * @param string $name
