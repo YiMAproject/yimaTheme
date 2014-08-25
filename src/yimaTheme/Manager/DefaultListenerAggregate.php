@@ -83,7 +83,9 @@ class DefaultListenerAggregate extends Manager implements
         $r = $e->getResult();
         if (!$r instanceof ViewModel)
             return; // we don't get Renderer Result
-        else $r->setAppend(true); // allow viewScripts to append with others on content variable
+
+        // allow viewScripts to append with others on content variable
+        else $r->setAppend(true);
 
         $this->checkMVC(); // test application startup config to match our need
 
