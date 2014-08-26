@@ -92,42 +92,47 @@ class DefaultListenerAggregate extends Manager implements
         /** @var $themeLocator Locator */
         $themeLocator = clone $this->getThemeLocator(); // we have to detach strategies
         
-        $pathStacks = array(); 
-        
-        $theme = $themeLocator->getPreparedThemeObject();
-        while($theme) {
+
+        // Attain to Base ViewModel to Children Themes Append To ... {
+        $pathStacks      = array();
+        $themAsViewModel = false;
+        while($theme = $themeLocator->getPreparedThemeObject())
+        {
             // store attained themes list
             $this->attainedThemes[] = $theme;
+
             $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName();
 
-            // initialize theme bootstrap
+            // initialize theme bootstrap, also we can know theme final after initialize
             if (!$theme->isInitialized())
                 $theme->init();
-            if ($theme->isFinalTheme())
+
+            if ($theme->isFinalTheme()) {
+                $themAsViewModel = spl_object_hash($theme); // use to add children themes to final
+                $defTemplate = $e->getViewModel()->getTemplate();
+                if (!$theme->getTemplate())
+                    $theme->setTemplate($defTemplate); // set default template name
+
+                // set themeObject as ViewModel
+                $e->setViewModel($theme);
                 break;
-            else {
-                $childTheme = $theme;
-
-                // attain to next template
-                $lastStrategy = $themeLocator->getResolverObject()
-                    ->getLastStrategyFound();
-                $themeLocator->getResolverObject()
-                    ->dettach($lastStrategy); // remove last detector
-
-                $theme = $themeLocator->getPreparedThemeObject();
-                if ($theme)
-                    $theme->addChild($childTheme, null, true);
-                else
-                    $theme = $childTheme->setFinalTheme(); // we have not other theme after this child
             }
+
+            // attain to next template
+            $lastStrategy = $themeLocator->getResolverObject()
+                ->getLastStrategyFound();
+            $themeLocator->getResolverObject()
+                ->dettach($lastStrategy); // remove last detector
         }
 
-        // set themeObject as ViewModel
-        $defTemplate = $e->getViewModel()
-            ->getTemplate();
-        if (!$theme->getTemplate())
-            $theme->setTemplate($defTemplate); // set default template name
-        $e->setViewModel($theme);
+        foreach($this->attainedThemes as $t) {
+            if ($themAsViewModel && spl_object_hash($t) === $themAsViewModel)
+                continue; // This is a Final Theme Child will added to
+
+            $e->getViewModel()
+                ->addChild($t, null, true);
+        }
+        // ... }
 
         // add path stacks
         $pathStacks = array_reverse($pathStacks); // child top and final theme must list last
