@@ -181,12 +181,24 @@ class Theme extends ViewModel
     /**
      * Get Theme Config Object Entity
      *
+     * @throws \Exception
      * @return Entity
      */
     public function config()
     {
         if (!$this->config) {
-            $this->config = new Entity();
+            $config = array();
+
+            $configFile = $this->getThemesPath()
+                .DIRECTORY_SEPARATOR.$this->getName()
+                .DIRECTORY_SEPARATOR.'theme.config.php';
+            if (file_exists($configFile)) {
+                $config = include_once $configFile;
+                if (!is_array($config))
+                    throw new \Exception('Invalid "'.$this->getName().'" Theme Config File. It must return array.');
+            }
+
+            $this->config = new Entity($config);
         }
 
         return $this->config;
