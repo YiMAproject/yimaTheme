@@ -83,7 +83,6 @@ class DefaultListenerAggregate extends Manager implements
         $r = $e->getResult();
         if (!$r instanceof ViewModel)
             return; // we don't get Renderer Result
-
         // allow viewScripts to append with others on content variable
         else $r->setAppend(true);
 
@@ -92,7 +91,6 @@ class DefaultListenerAggregate extends Manager implements
         /** @var $themeLocator Locator */
         $themeLocator = clone $this->getThemeLocator(); // we have to detach strategies
         
-
         // Attain to Base ViewModel to Children Themes Append To ... {
         $pathStacks      = array();
         $themAsViewModel = false;
@@ -129,8 +127,9 @@ class DefaultListenerAggregate extends Manager implements
             if ($themAsViewModel && spl_object_hash($t) === $themAsViewModel)
                 continue; // This is a Final Theme Child will added to
 
-            $e->getViewModel()
-                ->addChild($t, null, true);
+            if ($t->getTemplate)
+                // if child theme has a template to render
+                $e->getViewModel()->addChild($t, null, true);
         }
         // ... }
 
