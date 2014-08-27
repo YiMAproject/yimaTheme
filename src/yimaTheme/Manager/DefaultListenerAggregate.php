@@ -127,7 +127,7 @@ class DefaultListenerAggregate extends Manager implements
             if ($themAsViewModel && spl_object_hash($t) === $themAsViewModel)
                 continue; // This is a Final Theme Child will added to
 
-            if ($t->getTemplate)
+            if ($t->getTemplate())
                 // if child theme has a template to render
                 $e->getViewModel()->addChild($t, null, true);
         }
