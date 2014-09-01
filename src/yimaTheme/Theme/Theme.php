@@ -5,6 +5,7 @@ use Poirot\Dataset\Entity;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
+use Zend\View\Model\ModelInterface;
 use Zend\View\Model\ViewModel;
 
 /**
@@ -39,6 +40,11 @@ class Theme extends ViewModel
      * @var boolean
      */
     protected $isFinal = true;
+
+    /**
+     * @var Parent Theme Object
+     */
+    protected $parent;
 
     /**
      * @var Entity Theme Configs Entity
@@ -134,6 +140,41 @@ class Theme extends ViewModel
     }
 
     /**
+     * Add a child model
+     *
+     * @param  ModelInterface $child
+     * @param  null|string    $captureTo Optional; if specified, the "capture to" value to set on the child
+     * @param  null|bool      $append    Optional; if specified, append to child  with the same capture
+     *
+     * @return ViewModel
+     */
+    public function addChild(ModelInterface $child, $captureTo = null, $append = null)
+    {
+        parent::addChild($child, $captureTo, $append);
+
+        if ($child instanceof ThemeDefaultInterface) {
+            $child->parent = $this;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get Parent Theme
+     *
+     * @return ThemeDefaultInterface
+     */
+    public function getParentTheme()
+    {
+        if ($this->isFinalTheme()) {
+            // Final Theme can't have parent theme
+            return false;
+        }
+
+        return $this->parent;
+    }
+
+    /**
      * Set name of theme
      *
      * @param string $name
@@ -193,7 +234,7 @@ class Theme extends ViewModel
                 .DIRECTORY_SEPARATOR.$this->getName()
                 .DIRECTORY_SEPARATOR.'theme.config.php';
             if (file_exists($configFile)) {
-                $config = include_once $configFile;
+                $config = include $configFile;
                 if (!is_array($config))
                     throw new \Exception('Invalid "'.$this->getName().'" Theme Config File. It must return array.');
             }

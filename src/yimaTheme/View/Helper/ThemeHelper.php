@@ -18,8 +18,15 @@ class ThemeHelper extends AbstractHelper
      */
     public function __invoke()
     {
-        return $this->getView()
+        $viewModel = $this->getView()
             ->plugin('view_model')
-                ->getCurrent();
+            ->getCurrent();
+
+        if (!$viewModel instanceof ThemeDefaultInterface) {
+            // this is not Theme Object
+            // return root theme
+        }
+
+        return $viewModel;
     }
 }

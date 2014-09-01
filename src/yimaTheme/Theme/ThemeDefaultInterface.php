@@ -44,6 +44,14 @@ interface ThemeDefaultInterface extends
     public function setFinalTheme($bool = true);
 
     /**
+     * Get Parent Theme
+     * : return false if theme is final
+     *
+     * @return False|ThemeDefaultInterface
+     */
+    public function getParentTheme();
+
+    /**
      * Set name of theme
      *
      * @param string $name
