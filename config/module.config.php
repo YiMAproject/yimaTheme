@@ -10,11 +10,11 @@ return array(
              */
             'resolver_adapter_service' => array(
                 // resolver => priority
-                'yimaTheme\Resolvers\Theme\Config' => -1000,
-                // 'yimaTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
+                'yimaTheme.Resolvers.Theme.Config' => -1000,
+                'yimaTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
             ),
             # default template name on your themes folder
-            'default_theme_name'  => 'default', // used by yimaTheme\Resolvers\Theme\Config
+            'default_theme_name'  => 'default', // used by yimaTheme.Resolvers.Theme.Config
             'themes_default_path' => (defined('APP_DIR_APPLICATION'))
                     ? APP_DIR_APPLICATION .DS. 'themes' // used in Yima
                     : 'your_path_to_themes',
@@ -49,7 +49,7 @@ return array(
         // attention: some services registered via Module::getServiceConfig
 		'invokables' => array(
             # resolver theme name by config
-            'yimaTheme\Resolvers\Theme\Config' => 'yimaTheme\Resolvers\Theme\Config',
+            'yimaTheme.Resolvers.Theme.Config' => 'yimaTheme\Resolvers\Theme\Config',
 		),
 	),
 );
