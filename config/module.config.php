@@ -10,6 +10,7 @@ return array(
              */
             'resolver_adapter_service' => array(
                 // resolver => priority
+                // Resolvers can be either Service and Class
                 'yimaTheme.Resolvers.Theme.Config' => -1000,
                 'yimaTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
             ),
