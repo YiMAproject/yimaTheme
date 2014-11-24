@@ -10,9 +10,9 @@ return array(
              */
             'resolver_adapter_service' => array(
                 // resolver => priority
-                // Resolvers can be either Service and Class
-                'yimaTheme.Resolvers.Theme.Config' => -1000,
-                'yimaTheme\Resolvers\Theme\Sentenced' => -10000, //always return default theme
+                // Resolvers can be either Class or Service
+                'yimaTheme\Resolvers\Theme\Sentenced' => 1000, // return default static member if set
+                'yimaTheme.Resolvers.Theme.Config'    => -1000,
             ),
             # default template name on your themes folder
             'default_theme_name'  => 'default', // used by yimaTheme.Resolvers.Theme.Config

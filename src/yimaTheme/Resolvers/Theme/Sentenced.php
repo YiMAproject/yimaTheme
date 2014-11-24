@@ -14,8 +14,11 @@ class Sentenced implements
     /**
      * @var string Default Theme
      */
-    static protected $default_theme = 'default';
+    static protected $default_theme;
 
+    /**
+     * @inheritdoc
+     */
     function getName()
     {
         return ($this->theme) ? :self::$default_theme;
