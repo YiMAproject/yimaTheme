@@ -59,11 +59,11 @@ class Locator implements
     protected function getThemeObject()
     {
         $themeObject = $this->getServiceLocator()
-            ->get('yimaTheme\ThemeObject');
+            ->get('yimaTheme.ThemeObject');
         if (! $themeObject instanceof ThemeDefaultInterface) {
             throw new \Exception(
                 sprintf(
-                    'yimaTheme\ThemeObject must instanceof "\yimaTheme\Theme\ThemDefaultInterface" but "%s" given.',
+                    'yimaTheme.ThemeObject must instanceof "\yimaTheme\Theme\ThemDefaultInterface" but "%s" given.',
                     get_class($themeObject)
                 )
             );

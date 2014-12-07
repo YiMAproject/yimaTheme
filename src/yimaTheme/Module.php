@@ -9,6 +9,7 @@ use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\ViewHelperProviderInterface;
+use Zend\ServiceManager\ServiceManager;
 
 /**
  * Class Module
@@ -50,6 +51,8 @@ class Module implements
     }
 
     /**
+     * ! Because we wan't share by default set to false
+     *
     * @param ModuleEvent $e
     */
     public function onLoadModulesPostAddServices(ModuleEvent $e)
@@ -60,7 +63,7 @@ class Module implements
 
         /** @var $sm ServiceManager */
         $sm      = $moduleManager->getEvent()->getParam('ServiceManager');
-        $sm->setInvokableClass('yimaTheme\ThemeObject', 'yimaTheme\Theme\Theme', false);
+        $sm->setInvokableClass('yimaTheme.ThemeObject', 'yimaTheme\Theme\Theme', false);
     }
 
     /**
@@ -78,9 +81,10 @@ class Module implements
         $sm = $moduleManager->getEvent()->getParam('ServiceManager');
         $themManager = $sm->get('yimaTheme.Manager');
         if (!$themManager instanceof ManagerInterface) {
-            throw new \Exception(
-                sprintf('yimaTheme theme manager most instance of "ManagerInterface" but "%s" given.', get_class($themManager))
-            );
+            throw new \Exception(sprintf(
+                    'yimaTheme theme manager most instance of "ManagerInterface" but "%s" given.'
+                    , get_class($themManager)
+            ));
         }
 
         $themManager->init();
@@ -97,14 +101,14 @@ class Module implements
         return array (
             'invokables' => array (
                 'yimaTheme.Manager' => 'yimaTheme\Manager',
-                    'yimaTheme\ThemeManager\ListenerAggregate' => 'yimaTheme\Manager\DefaultListenerAggregate',
-                'yimaTheme\ThemeLocator' => 'yimaTheme\Theme\Locator',
+                'yimaTheme.Manager.ListenerAggregate' => 'yimaTheme\Manager\DefaultListenerAggregate',
+                'yimaTheme.ThemeLocator' => 'yimaTheme\Theme\Locator',
                     // because of this is shared serv. and with cloning problem -
                     // (we have to reset each objects).
                     // this model service set with service method with share by -
                     // default set to false
                     // on init module
-                    # 'yimaTheme\ThemeObject'  => 'yimaTheme\Theme\Theme',
+                    # 'yimaTheme.ThemeObject'  => 'yimaTheme\Theme\Theme',
             ),
         );
     }

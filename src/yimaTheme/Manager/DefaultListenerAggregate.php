@@ -245,7 +245,7 @@ class DefaultListenerAggregate extends Manager implements
      */
     public function setThemeLocator(LocatorDefaultInterface $themeLocator)
     {
-        $this->sm->setInvokableClass('yimaTheme\ThemeLocator', $themeLocator);
+        $this->sm->setInvokableClass('yimaTheme.ThemeLocator', $themeLocator);
 
         $this->themeLocator = $themeLocator;
 
@@ -261,10 +261,10 @@ class DefaultListenerAggregate extends Manager implements
     protected function getDefaultThemeLocator()
     {
         /** @var $defaultThemeLocator \yimaTheme\Theme\Locator */
-        $defaultThemeLocator = $this->sm->get('yimaTheme\ThemeLocator');
+        $defaultThemeLocator = $this->sm->get('yimaTheme.ThemeLocator');
         if (!$defaultThemeLocator instanceof LocatorDefaultInterface) {
             throw new \Exception(
-                'Default Theme Locator Service (yimaTheme\ThemeLocator) must instance of yimaTheme\Theme\LocatorDefaultInterface'
+                'Default Theme Locator Service (yimaTheme.ThemeLocator) must instance of yimaTheme\Theme\LocatorDefaultInterface'
             );
         }
 

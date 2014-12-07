@@ -1,7 +1,7 @@
 <?php
 namespace yimaTheme\Theme;
 
-use Poirot\Dataset\Entity;
+use Poirot\Collection\Entity;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;

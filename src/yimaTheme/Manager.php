@@ -42,18 +42,16 @@ class Manager implements
      */
     public function init()
     {
-        if ($this->isInitialized()) {
+        if ($this->isInitialized())
             return true;
-        }
 
         // attach default listeners
         /** @var $sharedEvents \Zend\EventManager\SharedEventManager */
         $sm = $this->getServiceManager();
-        $defaultListeners = $sm->get('yimaTheme\ThemeManager\ListenerAggregate');
-        if ($defaultListeners instanceof self) {
+        $defaultListeners = $sm->get('yimaTheme.Manager.ListenerAggregate');
+        if ($defaultListeners instanceof self)
             // inject themeManager
             $defaultListeners->manager = $this;
-        }
 
         $sharedEvents = $this->getEventManager()->getSharedManager();
         $sharedEvents->attachAggregate($defaultListeners);
