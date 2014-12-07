@@ -25,6 +25,7 @@ return array(
             'mvclayout_resolver_adapter' => array(
                 // inject exception layouts on 404,504,exception
                 // we want error layouts above others
+                // Resolvers can be either Class or Service
                 'yimaTheme\Resolvers\Layout\Error' => 10000,
             ),
             # default layouts, can override by theme specific conf.

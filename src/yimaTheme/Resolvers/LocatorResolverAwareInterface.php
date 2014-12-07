@@ -11,5 +11,12 @@ use yimaTheme\Theme\LocatorDefaultInterface;
  */
 interface LocatorResolverAwareInterface
 {
+    /**
+     * Inject Theme Locator Object
+     *
+     * @param LocatorDefaultInterface $l
+     *
+     * @return $this
+     */
     public function setThemeLocator(LocatorDefaultInterface $l);
 }

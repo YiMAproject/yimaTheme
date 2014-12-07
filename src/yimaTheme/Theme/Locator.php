@@ -127,15 +127,13 @@ class Locator implements
         // create resolver state object from config
         $config = $this->getConfig();
 
-        if (isset($config['theme_locator'])) {
+        if (isset($config['theme_locator']))
             $config = $config['theme_locator'];
-        } else {
+        else
             $config = array();
-        }
 
-        if (!isset($config[$state])) {
+        if (!isset($config[$state]))
             throw new \Exception("Theme Resolver Service not present in config[$state].");
-        }
 
         $config = $config[$state];
         // is string, 'resolver_adapter' => 'resolver\service'
@@ -177,11 +175,9 @@ class Locator implements
                 $service->setConfig($this->getConfig());
             }
             
-            if (isset($options['event_mvc'])) {
-                if ($service instanceof Resolvers\MvcResolverAwareInterface) {
+            if (isset($options['event_mvc']))
+                if ($service instanceof Resolvers\MvcResolverAwareInterface)
                 	$service->setMvcEvent($options['event_mvc']);
-            	}
-            }
 
             $resolver->attach($service, $priority);
         }

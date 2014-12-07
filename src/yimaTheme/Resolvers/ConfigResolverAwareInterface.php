@@ -10,7 +10,7 @@ namespace yimaTheme\Resolvers;
 interface ConfigResolverAwareInterface
 {
     /**
-     * Set yimaTheme merged config
+     * Inject yimaTheme merged config
      *
      * @param Array $config
      */
