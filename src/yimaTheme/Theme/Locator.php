@@ -77,12 +77,17 @@ class Locator implements
      *
      * @param MvcEvent $e
      *
+     * @throws \Exception
      * @return string | false
      */
     public function getMvcLayout(MvcEvent $e)
     {
-        $resolver = $this->getResolverObject('mvclayout_resolver_adapter', array('event_mvc' => $e));
-        
+        try {
+            $resolver = $this->getResolverObject('mvclayout_resolver_adapter', array('event_mvc' => $e));
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
         $layout = $resolver->getName();
         if (empty($layout) && ! ($layout === '0') ) {
             return false;
@@ -158,9 +163,8 @@ class Locator implements
             if ($this->getServiceLocator()->has($service)) {
                 $service = $this->getServiceLocator()->get($service);
             } else {
-                if (!class_exists($service)) {
-                    throw new \Exception("Resolver '$service' not found for yimaTheme.");
-                }
+                if (!class_exists($service))
+                    throw new \Exception("Resolver '$service' not found for yimaTheme as Service either Class.");
 
                 $service = new $service();
             }

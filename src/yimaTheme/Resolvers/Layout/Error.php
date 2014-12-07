@@ -34,32 +34,28 @@ class Error implements
         $e = $this->mvcEvent;
 
         $model = $e->getResult();
-        if (!$model instanceof ViewModel) {
+        if (!$model instanceof ViewModel)
             return false;
-        }
 
+        /** @var \Zend\Http\PhpEnvironment\Response $response */
         $response = $e->getResponse();
-
-        if ( $response->isSuccess() || $response->isOk() ) {
+        if ($response->isSuccess() || $response->isOk())
             // inject layout only if error happens
             return false;
-        }
 
         // detect theme config key by exception mode
         $confKey  = ($response->isServerError()) ? 'layout_exception'
             :( ($response->isNotFound()) ? 'layout_notfound'
                 :( ($response->isForbidden() || 401 == $response->getStatusCode()) ? 'layout_forbidden'
                     : 'layout_exception')  )
-
         ;
 
         // get config
         $config = $this->config;
-        if (is_array($config) && isset($config['theme_locator'])) {
+        if (is_array($config) && isset($config['theme_locator']))
             $config = $config['theme_locator'];
-        } else {
+        else
             $config = array();
-        }
 
         $template = array_key_exists($confKey, $config)
             ? $config[$confKey]
