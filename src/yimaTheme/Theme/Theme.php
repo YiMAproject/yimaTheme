@@ -64,13 +64,11 @@ class Theme extends ViewModel
      */
     public function __construct($name = null, $themesPath = null)
     {
-        if ($name !== null) {
+        if ($name !== null)
             $this->setName($name);
-        }
 
-        if ($themesPath !== null) {
+        if ($themesPath !== null)
             $this->setThemesPath($themesPath);
-        }
     }
 
     /**
@@ -81,13 +79,11 @@ class Theme extends ViewModel
      */
     public function init()
     {
-        if ($this->isInitialized()) {
+        if ($this->isInitialized())
             return $this;
-        }
 
-        if (!$this->getThemesPath() || !$this->getName()) {
+        if (!$this->getThemesPath() || !$this->getName())
             throw new \Exception('Theme Cant initialize because theme name or theme paths not present.');
-        }
 
         $themePathname = $this->getThemesPath().DS.$this->getName();
         if (!is_dir($themePathname))
@@ -95,7 +91,18 @@ class Theme extends ViewModel
 
         $bootstrap    = $themePathname.DS.'theme.bootstrap.php';
         if (file_exists($bootstrap)) {
-            include $bootstrap;
+            ob_start();
+            set_error_handler(
+                function($errno, $errstr) {
+                    throw new \ErrorException($errstr, $errno);
+                },
+                E_ALL
+            );
+
+            include $bootstrap; // Bootstrap Theme
+
+            restore_error_handler();
+            ob_get_clean();
         }
 
         $this->initialized = true;
