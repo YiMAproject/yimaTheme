@@ -1,24 +1,33 @@
 <?php
 namespace yimaTheme\Resolvers\Layout;
 
+use yimaTheme\Resolvers\LocatorResolverAwareInterface;
 use yimaTheme\Resolvers\ResolverInterface;
 use yimaTheme\Resolvers\MvcResolverAwareInterface;
 use yimaTheme\Resolvers\ConfigResolverAwareInterface;
 
+use yimaTheme\Theme\LocatorDefaultInterface;
 use Zend\View\Model\ModelInterface as ViewModel;
 
 use Zend\Mvc\MvcEvent;
 
 /**
- * Agar dar response status code e khataa baashad bar asaase aan
- * layout e namaaiesh raa dar soorat e vojood avaz mikonad
+ * Change Theme Layout If Error Happens
+ * - look in "layout_*" on yimaTheme Merged Config in "theme_locator"
+ * - look in "layout_*" options for "theme"[detected_theme] ..
  *
  */
 class Error implements
     ResolverInterface,
+    LocatorResolverAwareInterface,
     MvcResolverAwareInterface,
     ConfigResolverAwareInterface
 {
+    /**
+     * @var LocatorDefaultInterface
+     */
+    protected $themeLocator;
+
     /**
      * @var array
      */
@@ -40,7 +49,7 @@ class Error implements
         /** @var \Zend\Http\PhpEnvironment\Response $response */
         $response = $e->getResponse();
         if ($response->isSuccess() || $response->isOk())
-            // inject layout only if error happens
+            // No Error Happens We Do Nothing ..
             return false;
 
         // detect theme config key by exception mode
@@ -50,16 +59,32 @@ class Error implements
                     : 'layout_exception')  )
         ;
 
-        // get config
+        // get error template from yimaTheme merged config if exists >>>> {
         $config = $this->config;
+        // default error layout
         if (is_array($config) && isset($config['theme_locator']))
-            $config = $config['theme_locator'];
+            $tconfig = $config['theme_locator'];
         else
-            $config = array();
+            $tconfig = array();
 
-        $template = array_key_exists($confKey, $config)
-            ? $config[$confKey]
+        $template = (string) array_key_exists($confKey, $tconfig)
+            ? $tconfig[$confKey]
             : false;
+
+        // specific error layout
+        $currTheme = $this->themeLocator->getPreparedThemeObject()->getName();
+        if (is_array($config) && isset($config['themes'])
+            && isset($config['themes'][$currTheme])
+        )
+            $tconfig = $config['themes'][$currTheme];
+        else
+            $tconfig = array();
+
+        $template = array_key_exists($confKey, $tconfig)
+            ? $tconfig[$confKey]
+            : $template;
+
+        // <<<< }
 
         /* Move this out of here
          * if (! empty($template))
@@ -82,7 +107,7 @@ class Error implements
             }
         }*/
 
-        return (! empty($template)) ? $template : false;
+        return $template;
     }
 
     public function setMvcEvent(MvcEvent $e)
@@ -98,5 +123,17 @@ class Error implements
     public function setConfig(array $config)
     {
         $this->config = $config;
+    }
+
+    /**
+     * Inject Theme Locator Object
+     *
+     * @param LocatorDefaultInterface $l
+     *
+     * @return $this
+     */
+    public function setThemeLocator(LocatorDefaultInterface $l)
+    {
+        $this->themeLocator = $l;
     }
 }

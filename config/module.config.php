@@ -28,7 +28,7 @@ return array(
                 // Resolvers can be either Class or Service
                 'yimaTheme\Resolvers\Layout\Error' => 10000,
             ),
-            # default layouts, can override by theme specific conf.
+            # default layouts, can override by theme specific conf. see 'themes''default'
             // used by yimaTheme\Resolvers\Layout\Error
             'layout_notfound'  => 'default',
             'layout_exception' => 'default',
@@ -43,6 +43,10 @@ return array(
                 # u can change this theme to another folder.(realpath returned automatically)
                 # in this folder folder with builder (name of theme) must found.
                 'dir_path' => __DIR__ .DS. '..' .DS. 'themes',
+                // used by yimaTheme\Resolvers\Layout\Error
+                'layout_notfound'  => 'default',
+                'layout_exception' => 'default',
+                'layout_forbidden' => 'default',
             ),
         ),
     ),
