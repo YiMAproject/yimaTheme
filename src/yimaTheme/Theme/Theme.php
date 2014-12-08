@@ -241,7 +241,19 @@ class Theme extends ViewModel
                 .DIRECTORY_SEPARATOR.$this->getName()
                 .DIRECTORY_SEPARATOR.'theme.config.php';
             if (file_exists($configFile)) {
+                ob_start();
+                set_error_handler(
+                    function($errno, $errstr) {
+                        throw new \ErrorException($errstr, $errno);
+                    },
+                    E_ALL
+                );
+
                 $config = include $configFile;
+
+                restore_error_handler();
+                ob_get_clean();
+
                 if (!is_array($config))
                     throw new \Exception('Invalid "'.$this->getName().'" Theme Config File. It must return array.');
             }
