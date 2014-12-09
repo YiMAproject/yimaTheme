@@ -1,6 +1,7 @@
 <?php
 namespace yimaTheme\Theme;
-use Poirot\Dataset\Entity;
+
+use Poirot\Core\Entity;
 use Zend\View\Model\ModelInterface;
 
 /**
