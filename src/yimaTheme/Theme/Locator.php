@@ -113,6 +113,9 @@ class Locator implements
     
     /**
      * Get Resolver Object used by Locator
+     *
+     * @TODO It Seems Have Conflict on Locator used Global-
+     *       -Layout Resolver defined on merged config Against Theme Specific Resolver For Layout
      * 
      * @param string $state   Setup configuration resolver
      * @param array  $options Options

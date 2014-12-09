@@ -5,6 +5,7 @@ use yimaTheme\Manager;
 use yimaTheme\Theme\Locator;
 use yimaTheme\Theme\LocatorDefaultInterface;
 use yimaTheme\Theme\LocatorInterface;
+use yimaTheme\Theme\Theme;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\EventManager\SharedListenerAggregateInterface;
 use Zend\Http\PhpEnvironment\Response;
@@ -38,11 +39,16 @@ class DefaultListenerAggregate extends Manager implements
      * @var array Initialized Themes
      */
     protected $attainedThemes = array();
+    /**
+     * @var array Attained Themes PathStack
+     */
+    protected $pathStacks = array();
 
     /**
      * @var Manager
      */
     protected $manager;
+
 
     /**
      * Attach one or more listeners
@@ -54,13 +60,10 @@ class DefaultListenerAggregate extends Manager implements
      */
     public function attachShared(SharedEventManagerInterface $events)
     {
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this, 'onMvcBootstrap'), 100000);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_BOOTSTRAP, array($this, 'onMvcBootstrapLast'), -100000);
 
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH, array($this, 'onDispatchThemeBootstrap'), -95);
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchThemeBootstrap'), -95);
-
-        $events->attach('Zend\Mvc\Controller\AbstractController', MvcEvent::EVENT_DISPATCH,array($this, 'onDispatchSpecLayout'), -99);
-        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_DISPATCH_ERROR, array($this,'onDispatchSpecLayout'), -99);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this, 'onRenderAddPathStacks'), -900);
+        $events->attach('Zend\Mvc\Application', MvcEvent::EVENT_RENDER, array($this, 'onRenderSpecLayout'), -1000);
     }
 
     // --- Events Methods ---------------------------------------------------------------------------------------------------------------------
@@ -68,38 +71,28 @@ class DefaultListenerAggregate extends Manager implements
     /**
      * MVC Event Listener
      *
-     * @param MvcEvent $e
-     */
-    public function onMvcBootstrap(MvcEvent $e) { }
-        
-    /**
-     * MVC Event Listener
-     * : bootstrap themes
+     * - get Theme From Locator
+     * - initialize theme if not
+     * - set theme template to default viewModel template name
+     *   if not exists
+     * - set Resolved Theme to Event as ViewModel
      *
      * @param MvcEvent $e
      */
-    public function onDispatchThemeBootstrap(MvcEvent $e) 
+    public function onMvcBootstrapLast(MvcEvent $e)
     {
-        $r = $e->getResult();
-        if (!$r instanceof ViewModel)
-            return; // we don't get Renderer Result
-        // allow viewScripts to append with others on content variable
-        else $r->setAppend(true);
-
         $this->checkMVC(); // test application startup config to match our need
 
         /** @var $themeLocator Locator */
         $themeLocator = clone $this->getThemeLocator(); // we have to detach strategies
-        
         // Attain to Base ViewModel to Children Themes Append To ... {
-        $pathStacks      = array();
         $themAsViewModel = false;
         while($theme = $themeLocator->getPreparedThemeObject())
         {
             // store attained themes list
             $this->attainedThemes[] = $theme;
 
-            $pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName();
+            $this->pathStacks[] = $theme->getThemesPath().DIRECTORY_SEPARATOR. $theme->getName();
 
             // initialize theme bootstrap, also we can know theme final after initialize
             if (!$theme->isInitialized())
@@ -123,6 +116,7 @@ class DefaultListenerAggregate extends Manager implements
                 ->dettach($lastStrategy); // remove last detector
         }
 
+        /** @var Theme $t */
         foreach($this->attainedThemes as $t) {
             if ($themAsViewModel && spl_object_hash($t) === $themAsViewModel)
                 continue; // This is a Final Theme Child will added to
@@ -132,27 +126,24 @@ class DefaultListenerAggregate extends Manager implements
                 $e->getViewModel()->addChild($t, null, true);
         }
         // ... }
+    }
+        
+    /**
+     * MVC Event Listener
+     *
+     * @param MvcEvent $e
+     */
+    public function onRenderAddPathStacks(MvcEvent $e)
+    {
+        $r = $e->getResult();
+        if (!$r instanceof ViewModel)
+            return; // we don't get Renderer Result
+        // allow viewScripts to append with others on content variable
+        else $r->setAppend(true);
 
         // add path stacks
-        $pathStacks = array_reverse($pathStacks); // child top and final theme must list last
-        $this->addThemePathstack($pathStacks);
-    }
-
-    protected function setThemeManager(Manager $themeManager)
-    {
-        $this->manager = $themeManager;
-    }
-
-    /**
-     * Add Requested template path to Stack of ViewTemplatePathStack
-     *
-     * @param array $paths
-     * @internal param \Zend\Mvc\MvcEvent $e
-     */
-    protected function addThemePathstack(array $paths)
-    {
         $viewTemplatePathStack = $this->sm->get('ViewTemplatePathStack');
-        foreach ($paths as $path) {
+        foreach (array_reverse($this->pathStacks) as $path) { // child top and final theme must list last
             $viewTemplatePathStack->addPath($path);
         }
     }
@@ -162,7 +153,7 @@ class DefaultListenerAggregate extends Manager implements
      *
      * @param MvcEvent $e
      */
-    public function onDispatchSpecLayout(MvcEvent $e)
+    public function onRenderSpecLayout(MvcEvent $e)
     {
         $r = $e->getResult();
         if (! $r instanceof ViewModel )
@@ -173,7 +164,7 @@ class DefaultListenerAggregate extends Manager implements
         $themeLocator  = $this->getThemeLocator();
 
         // we want theme path stack registered before
-        #$this->onDispatchThemeBootstrap($e);
+        #$this->onRenderAddPathStacks($e);
 
         // get Layout from Locator
         $mvcLayout = $themeLocator->getMvcLayout($e);
@@ -224,13 +215,21 @@ class DefaultListenerAggregate extends Manager implements
     /**
      * Get ThemeLocator
      *
+     * @throws \Exception
      * @return LocatorDefaultInterface
      */
     public function getThemeLocator()
     {
         if (! $this->themeLocator) {
             // use default theme locator to resolve theme object
-            $this->themeLocator = $this->getDefaultThemeLocator();
+            /** @var $defaultThemeLocator \yimaTheme\Theme\Locator */
+            $defaultThemeLocator = $this->sm->get('yimaTheme.ThemeLocator');
+            if (!$defaultThemeLocator instanceof LocatorDefaultInterface) {
+                throw new \Exception(
+                    'Default Theme Locator Service (yimaTheme.ThemeLocator) must instance of yimaTheme\Theme\LocatorDefaultInterface'
+                );
+            }
+            $this->themeLocator = $defaultThemeLocator;
         }
 
         return $this->themeLocator;
@@ -250,25 +249,6 @@ class DefaultListenerAggregate extends Manager implements
         $this->themeLocator = $themeLocator;
 
         return $this;
-    }
-
-    /**
-     * Get Default Theme Locator for registered services in serviceManager
-     *
-     * @return Locator
-     * @throws \Exception
-     */
-    protected function getDefaultThemeLocator()
-    {
-        /** @var $defaultThemeLocator \yimaTheme\Theme\Locator */
-        $defaultThemeLocator = $this->sm->get('yimaTheme.ThemeLocator');
-        if (!$defaultThemeLocator instanceof LocatorDefaultInterface) {
-            throw new \Exception(
-                'Default Theme Locator Service (yimaTheme.ThemeLocator) must instance of yimaTheme\Theme\LocatorDefaultInterface'
-            );
-        }
-
-        return $defaultThemeLocator;
     }
 
     // --- implemented methods ------------------------------------------------------------------------------------------------------------------
