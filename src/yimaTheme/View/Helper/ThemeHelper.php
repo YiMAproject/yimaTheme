@@ -1,32 +1,90 @@
 <?php
 namespace yimaTheme\View\Helper;
 
-use yimaTheme\Theme\LocatorDefaultInterface;
 use yimaTheme\Theme\ThemeDefaultInterface;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\AbstractHelper;
+use Zend\View\Model\ModelInterface;
+use Zend\View\Renderer\PhpRenderer;
 
-/**
- * Class ThemeHelper
- * @package yimaTheme\View\Helper
- */
 class ThemeHelper extends AbstractHelper
+    implements ServiceLocatorAwareInterface
 {
-    /**
-     * Class act as functor
-     *
-     * @return ThemeDefaultInterface
-     */
-    public function __invoke()
+    protected $sl;
+
+    function __invoke()
     {
-        $viewModel = $this->getView()
-            ->plugin('view_model')
-            ->getCurrent();
+        $theme = $this->getCurrent();
+        if (!$theme instanceof ThemeDefaultInterface)
+            $theme = $this->getRoot();
 
-        if (!$viewModel instanceof ThemeDefaultInterface) {
-            // this is not Theme Object
-            // return root theme
-        }
+        return $theme;
+    }
 
-        return $viewModel;
+    /**
+     * Get Root View Model
+     *
+     * @return ModelInterface
+     */
+    function getRoot()
+    {
+        $sm    = $this->sl->getServiceLocator();
+        $event = $sm->get('Application')
+            ->getMvcEvent();
+
+        return $event->getViewModel();
+    }
+
+    /**
+     * Proxy Call to View Model Helper
+     *
+     * @param $method
+     * @param $args
+     *
+     * @return mixed
+     */
+    function __call($method, $args)
+    {
+        return call_user_func_array(
+            array($this->attainViewModelHelper(), $method)
+            , $args
+        );
+    }
+
+    /**
+     * Attain to View Model Helper
+     *
+     * ! to get root and current view model
+     *
+     * @return PhpRenderer
+     */
+    protected function attainViewModelHelper()
+    {
+        /** @var PhpRenderer $viewModelHelper */
+        $viewModelHelper = $this->getView()
+            ->plugin('view_model');
+
+        return $viewModelHelper;
+    }
+
+    /**
+     * Set service locator
+     *
+     * @param ServiceLocatorInterface $serviceLocator
+     */
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    {
+        $this->sl = $serviceLocator;
+    }
+
+    /**
+     * Get service locator
+     *
+     * @return ServiceLocatorInterface
+     */
+    public function getServiceLocator()
+    {
+        return $this->sl;
     }
 }
