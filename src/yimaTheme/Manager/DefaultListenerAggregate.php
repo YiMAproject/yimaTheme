@@ -156,7 +156,7 @@ class DefaultListenerAggregate extends Manager implements
     public function onRenderSpecLayout(MvcEvent $e)
     {
         $r = $e->getResult();
-        if (! $r instanceof ViewModel )
+        if (! $r instanceof ViewModel || $r->terminate())
             return;
 
         $model = $e->getViewModel();
