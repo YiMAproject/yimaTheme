@@ -126,6 +126,13 @@ class DefaultListenerAggregate extends Manager implements
                 $e->getViewModel()->addChild($t, null, true);
         }
         // ... }
+
+
+        // TODO sometimes we need to render a widget in action, and with current template viewScript file
+        $viewTemplatePathStack = $this->sm->get('ViewTemplatePathStack');
+        foreach (array_reverse($this->pathStacks) as $path) { // child top and final theme must list last
+            $viewTemplatePathStack->addPath($path);
+        }
     }
         
     /**
